@@ -1,0 +1,16 @@
+# Earthdata credentials
+.dodsrc
+.netrc
+_netrc
+
+# Temporary Office files
+~$*
+
+# Python cache
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Raw downloaded datasets
+data/raw/

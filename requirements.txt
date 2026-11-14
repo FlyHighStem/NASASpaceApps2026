@@ -1,9 +1,11 @@
-numpy
-pandas
-scipy
-xarray
-netcdf4
 requests
+pandas
+numpy
+matplotlib
+xarray
+netCDF4
+scipy
+netcdf4
 streamlit
 plotly
 earthaccess
