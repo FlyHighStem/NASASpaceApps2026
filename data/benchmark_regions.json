@@ -1,0 +1,10 @@
+{"frozen": true,
+ "note": "DRAFT boxes. Verify against the NASA 'Human Fingerprint on Earth's Water Cycle' story, then set frozen=true and commit BEFORE running.",
+ "regions": [
+  {"name": "Northwest India", "lat": [24, 32], "lon": [70, 78], "expected": "down", "tier": "resolvable"},
+  {"name": "Maranhao, Brazil", "lat": [-10, -2], "lon": [-48, -42], "expected": "up", "tier": "marginal"},
+  {"name": "East/central Africa (verify vs story)", "lat": [-12, 2], "lon": [28, 38], "expected": "up", "tier": "marginal"},
+  {"name": "Middle East / Iran", "lat": [28, 36], "lon": [44, 60], "expected": "down", "tier": "resolvable"},
+  {"name": "North China Plain", "lat": [34, 40], "lon": [114, 120], "expected": "down", "tier": "marginal"},
+  {"name": "California Central Valley", "lat": [35, 40], "lon": [-122, -119], "expected": "down", "tier": "unlikely"},
+  {"name": "Sahara (negative control)", "lat": [18, 28], "lon": [-5, 25], "expected": "none", "tier": "resolvable"}]}

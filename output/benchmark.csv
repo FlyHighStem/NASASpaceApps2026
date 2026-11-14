@@ -1,0 +1,8 @@
+name,tier,expected,n_mascons,slope,p,observed,result
+Northwest India,resolvable,down,9,-1.6141581637999505,9.27444453679982e-07,down,recovered
+"Maranhao, Brazil",marginal,up,5,0.7947902508706886,0.04233103782986536,up,recovered
+East/central Africa (verify vs story),marginal,up,20,1.589142370492677,2.1663549820694072e-06,up,recovered
+Middle East / Iran,resolvable,down,15,-0.9593310477643906,4.48674408737304e-09,down,recovered
+North China Plain,marginal,down,4,-0.8248555828857588,0.0013064279032353188,down,recovered
+California Central Valley,unlikely,down,2,-1.4387551221788288,0.00030698294704145646,down,recovered
+Sahara (negative control),resolvable,none,30,-0.0815346259380126,0.0010718312454465195,down,"contradicted (down, significant)"
