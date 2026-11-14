@@ -1,4 +1,4 @@
-{"frozen": true,
+{"frozen": false,
  "note": "DRAFT boxes. Verify against the NASA 'Human Fingerprint on Earth's Water Cycle' story, then set frozen=true and commit BEFORE running.",
  "regions": [
   {"name": "Northwest India", "lat": [24, 32], "lon": [70, 78], "expected": "down", "tier": "resolvable"},
