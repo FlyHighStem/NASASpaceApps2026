@@ -107,6 +107,14 @@ CATALOG = {
 }
 
 
+import contextlib
+@contextlib.contextmanager
+def _atomic(path):
+    """Write to a temp file, then rename, so a reader never sees a half-written (empty) file."""
+    tmp = path + ".tmp"
+    with open(tmp, "w") as f: yield f
+    os.replace(tmp, path)
+
 def add_var(name, table, coords, source, jobs=1, gap=NOGAP):
     d = f"{V}/{name}"
     os.makedirs(d, exist_ok=True)
@@ -126,7 +134,7 @@ def add_var(name, table, coords, source, jobs=1, gap=NOGAP):
     R.to_csv(f"{d}/regions.csv", index=False)
     P.to_csv(f"{d}/pairs.csv", index=False)
 
-    with open(f"{d}/meta.json", "w") as f:
+    with _atomic(f"{d}/meta.json") as f:
         json.dump(
             dict(
                 source=source,
@@ -165,7 +173,7 @@ def register_grace():
     with open(f"{O}/sources.json") as f:
         m = json.load(f)
 
-    with open(f"{d}/meta.json", "w") as f:
+    with _atomic(f"{d}/meta.json") as f:
         json.dump(
             dict(
                 source=m["source"],

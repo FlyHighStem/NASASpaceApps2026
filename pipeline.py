@@ -1,7 +1,7 @@
 """One-command setup for Counterpoint: runs every preliminary step in order, skipping what is already done.
 app.py starts it in a background thread on launch; you can also run `python pipeline.py` to do it in the terminal.
 Real NASA data only. Needs an Earthdata login (env vars, ~/.netrc, or .env) for GRACE; everything else is optional."""
-import datetime, glob, netrc, os, subprocess, sys, threading, time
+import datetime, glob, netrc, os, subprocess, sys, threading, time, json
 
 ROOT = os.path.dirname(os.path.abspath(__file__)); O = os.path.join(ROOT, "output"); V = os.path.join(O, "vars"); LOG = os.path.join(O, "pipeline.log")
 PY = sys.executable; JOBS = str(max(1, (os.cpu_count() or 2)-1))
@@ -30,7 +30,13 @@ def creds():
     return bool(os.environ.get("EARTHDATA_USERNAME") and os.environ.get("EARTHDATA_PASSWORD"))
 
 # ---------------- done-checks
-def has(var): return os.path.exists(os.path.join(V, var, "results.csv"))
+def has(var):
+    """A feature is ready only when results.csv exists AND meta.json (written last) parses."""
+    d = os.path.join(V, var)
+    try:
+        with open(os.path.join(d, "meta.json")) as f: json.load(f)
+        return os.path.exists(os.path.join(d, "results.csv"))
+    except Exception: return False
 def find_grace():
     f = glob.glob(os.path.join(ROOT, "data", "GRCTellus*.nc")) or glob.glob(os.path.join(ROOT, "data", "*MSCN*.nc"))
     return max(f, key=os.path.getsize) if f else None
@@ -139,7 +145,7 @@ def render(st):
 def sidebar_status(st, known, allowed):
     """Sidebar panel for background layers (power, fires, groundwater). Reruns the app when a new feature appears."""
     def body():
-        have = {d for d in (os.listdir(V) if os.path.isdir(V) else []) if os.path.exists(f"{V}/{d}/results.csv")} & set(allowed)
+        have = {d for d in (os.listdir(V) if os.path.isdir(V) else []) if has(d)} & set(allowed)
         if have != set(known): st.rerun()
         with st.expander("Background setup" + (" (running)" if running() else ""), expanded=running()):
             _rows(st)
