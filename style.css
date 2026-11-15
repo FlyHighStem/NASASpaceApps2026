@@ -192,24 +192,77 @@ div[data-testid="stDownloadButton"] button {
     min-height: 42px !important;
 }
 
-/* Explore Our Data button */
-div.st-key-data_button button,
-div.st-key-data_button button p {
-    background-color: #2563A6 !important;
+
+/* ---- Explore Our Data: Neon Blue ---- */
+div.st-key-data_button button {
+    background: linear-gradient(135deg, #2563EB, #06B6D4) !important;
     color: #FFFFFF !important;
-    font-weight: 700 !important;
+    border: none !important;
+    outline: none !important;
+    border-radius: 10px !important;
+    font-weight: 800 !important;
+    box-shadow: 0 0 10px rgba(37, 99, 235, 0.35) !important;
+    transition: all 0.25s ease !important;
+}
+
+div.st-key-data_button button p {
+    background: transparent !important;
+    color: #FFFFFF !important;
+    font-weight: 800 !important;
 }
 
 div.st-key-data_button button:hover {
-    background-color: #1D4F85 !important;
-    border-color: #1D4F85 !important;
-    color: #FFFFFF !important;
+    background: linear-gradient(135deg, #1D4ED8, #0891B2) !important;
+    box-shadow: 0 0 18px rgba(6, 182, 212, 0.65) !important;
+    transform: translateY(-2px);
 }
 
-/* Credits button */
-div.st-key-credits_button button,
-div.st-key-credits_button button p {
-    background-color: #0D9488 !important;
+
+/* ---- Methodology & Evidence: Neon Green ---- */
+div.st-key-methodology_button button {
+    background: linear-gradient(135deg, #059669, #22C55E) !important;
     color: #FFFFFF !important;
-    font-weight: 700 !important;
+    border: none !important;
+    outline: none !important;
+    border-radius: 10px !important;
+    font-weight: 800 !important;
+    box-shadow: 0 0 10px rgba(34, 197, 94, 0.35) !important;
+    transition: all 0.25s ease !important;
+}
+
+div.st-key-methodology_button button p {
+    background: transparent !important;
+    color: #FFFFFF !important;
+    font-weight: 800 !important;
+}
+
+div.st-key-methodology_button button:hover {
+    background: linear-gradient(135deg, #047857, #16A34A) !important;
+    box-shadow: 0 0 18px rgba(74, 222, 128, 0.65) !important;
+    transform: translateY(-2px);
+}
+
+
+/* ---- Meet the Team & Credits: Neon Purple ---- */
+div.st-key-credits_button button {
+    background: linear-gradient(135deg, #7C3AED, #A855F7) !important;
+    color: #FFFFFF !important;
+    border: none !important;
+    outline: none !important;
+    border-radius: 10px !important;
+    font-weight: 800 !important;
+    box-shadow: 0 0 10px rgba(168, 85, 247, 0.35) !important;
+    transition: all 0.25s ease !important;
+}
+
+div.st-key-credits_button button p {
+    background: transparent !important;
+    color: #FFFFFF !important;
+    font-weight: 800 !important;
+}
+
+div.st-key-credits_button button:hover {
+    background: linear-gradient(135deg, #6D28D9, #9333EA) !important;
+    box-shadow: 0 0 18px rgba(192, 132, 252, 0.65) !important;
+    transform: translateY(-2px);
 }

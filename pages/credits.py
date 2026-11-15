@@ -26,7 +26,7 @@ def load_css():
 load_css()
 
 if st.button("← Back to Main Dashboard", key="back_home"):
-    st.switch_page("app.py")
+    st.switch_page("home.py")
 
 
 # ---------------------------------------------------------------------

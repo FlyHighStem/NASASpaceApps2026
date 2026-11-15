@@ -16,7 +16,10 @@ credits = st.Page(
     title="Credits"
 )
 
-# x = st.Page()
+methods = st.Page(
+    "pages/methods.py",
+        title="Methods"
+)
 
-pg = st.navigation([home, data, credits])
+pg = st.navigation([home, data, credits, methods])
 pg.run()
