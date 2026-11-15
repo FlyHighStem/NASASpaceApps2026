@@ -530,7 +530,7 @@ Fire counts are MODIS detections, not burned area, and are affected by cloud cov
 # ---- Bottom navigation
 st.markdown("---")
 
-nav1, nav2 = st.columns(2)
+nav1, nav2, nav3 = st.columns(3)
 
 with nav1:
     if st.button(
@@ -541,6 +541,14 @@ with nav1:
         st.switch_page("pages/data.py")
 
 with nav2:
+    if st.button(
+            "📐 Methodology & Evidence",
+            key="methodology_button",
+            use_container_width=True
+    ):
+        st.switch_page("pages/methods.py")
+
+with nav3:
     if st.button(
             "🌎 Meet the Team & View Credits",
             key="credits_button",

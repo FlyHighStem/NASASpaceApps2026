@@ -30,6 +30,9 @@ def load_css():
 
 load_css()
 
+if st.button("← Back to Main Dashboard", key="back_home_top"):
+    st.switch_page("home.py")
+
 
 # ---------------------------------------------------------------------
 # Page content
@@ -506,24 +509,6 @@ st.info(
 # ---------------------------------------------------------------------
 
 st.divider()
-
-nav1, nav2 = st.columns(2)
-
-with nav1:
-    if st.button(
-        "← Back to Main Dashboard",
-        key="back_home",
-        width="stretch"
-    ):
-        st.switch_page("home.py")
-
-with nav2:
-    if st.button(
-        "🌎 Meet the Team & View Credits",
-        key="credits_button",
-        width="stretch"
-    ):
-        st.switch_page("pages/credits.py")
 
 st.caption(
     "Counterpoint: Earth System Trend Detective | "
