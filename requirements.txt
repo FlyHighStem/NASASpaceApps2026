@@ -1,6 +1,12 @@
+numpy
 pandas
+scipy
 xarray
 netcdf4
-streamlit
+requests
+streamlit>=1.50
 plotly
 earthaccess
+pymannkendall
+matplotlib
+pytest

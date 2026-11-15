@@ -1,4 +1,5 @@
 up,down,km,up_slope,down_slope,score,up_driver,down_driver,verdict
+<<<<<<< HEAD
 7,8,2472,1.3354111733456526,-16.486624317905736,32.31647596621364,unreliable,unreliable,"The precipitation trend is not significant on one or both sides, so the driver check is inconclusive."
 87,90,1834,2.804987060648739,-6.173837874126148,31.91960242447509,unreliable,unreliable,"The precipitation trend is not significant on one or both sides, so the driver check is inconclusive."
 7,14,5699,1.3354111733456526,-1.4224323971234571,26.090822376179773,unreliable,unreliable,"The precipitation trend is not significant on one or both sides, so the driver check is inconclusive."
@@ -9,3 +10,15 @@ up,down,km,up_slope,down_slope,score,up_driver,down_driver,verdict
 3,1,2031,21.11652474404851,-0.5274773013056547,15.664083373079142,unreliable,unreliable,"The precipitation trend is not significant on one or both sides, so the driver check is inconclusive."
 7,1,1500,1.3354111733456526,-0.5274773013056547,15.664083373079142,unreliable,unreliable,"The precipitation trend is not significant on one or both sides, so the driver check is inconclusive."
 3,9,4025,21.11652474404851,-3.2238387943378535,14.674183243864704,unreliable,unreliable,"The precipitation trend is not significant on one or both sides, so the driver check is inconclusive."
+=======
+6,7,2472,1.3354111733456526,-16.486624317905736,32.31647596621364,unreliable,unreliable,"The precipitation trend is not significant on one or both sides, so the driver check is inconclusive."
+87,90,1831,2.804987060648739,-6.086626607329272,31.90227582582925,follows,unreliable,"The precipitation trend is not significant on one or both sides, so the driver check is inconclusive."
+6,13,5699,1.3354111733456526,-1.4224323971234571,26.090822376179773,unreliable,unreliable,"The precipitation trend is not significant on one or both sides, so the driver check is inconclusive."
+3,7,383,21.11652474404851,-16.486624317905736,25.69554651623888,follows,unreliable,"The precipitation trend is not significant on one or both sides, so the driver check is inconclusive."
+3,13,4030,21.11652474404851,-1.4224323971234571,25.69554651623888,follows,unreliable,"The precipitation trend is not significant on one or both sides, so the driver check is inconclusive."
+87,89,4939,2.804987060648739,-0.7873288720430346,25.214162545650982,follows,unreliable,"The precipitation trend is not significant on one or both sides, so the driver check is inconclusive."
+87,88,1404,2.804987060648739,-16.599421543016796,16.795403906049977,follows,unreliable,"The precipitation trend is not significant on one or both sides, so the driver check is inconclusive."
+3,1,2031,21.11652474404851,-0.5274773013056547,15.664083373079142,follows,unreliable,"The precipitation trend is not significant on one or both sides, so the driver check is inconclusive."
+6,1,1500,1.3354111733456526,-0.5274773013056547,15.664083373079142,unreliable,unreliable,"The precipitation trend is not significant on one or both sides, so the driver check is inconclusive."
+6,8,2760,1.3354111733456526,-3.2238387943378535,14.674183243864704,unreliable,unreliable,"The precipitation trend is not significant on one or both sides, so the driver check is inconclusive."
+>>>>>>> main

@@ -1,10 +1,13 @@
-{"frozen": true,
- "note": "DRAFT boxes. Verify against the NASA 'Human Fingerprint on Earth's Water Cycle' story, then set frozen=true and commit BEFORE running.",
- "regions": [
-  {"name": "Northwest India", "lat": [24, 32], "lon": [70, 78], "expected": "down", "tier": "resolvable"},
-  {"name": "Maranhao, Brazil", "lat": [-10, -2], "lon": [-48, -42], "expected": "up", "tier": "marginal"},
-  {"name": "East/central Africa (verify vs story)", "lat": [-12, 2], "lon": [28, 38], "expected": "up", "tier": "marginal"},
-  {"name": "Middle East / Iran", "lat": [28, 36], "lon": [44, 60], "expected": "down", "tier": "resolvable"},
-  {"name": "North China Plain", "lat": [34, 40], "lon": [114, 120], "expected": "down", "tier": "marginal"},
-  {"name": "California Central Valley", "lat": [35, 40], "lon": [-122, -119], "expected": "down", "tier": "unlikely"},
-  {"name": "Sahara (negative control)", "lat": [18, 28], "lon": [-5, 25], "expected": "none", "tier": "resolvable"}]}
+{
+  "frozen": false,
+  "frozen_on": null,
+  "note": "DRAFT in the schema counterpoint.py reads (lat/lon as [min, max]; expected = up | down | none). Boxes come from general knowledge, not from the NASA story. Verify each box and sign, add the sub-Saharan regions the story names, then set frozen to true and commit BEFORE the real run.",
+  "regions": [
+    {"name": "Northwest India (Punjab, Haryana, Rajasthan)", "tier": "resolvable", "expected": "down", "lat": [24.0, 32.0], "lon": [70.0, 78.0]},
+    {"name": "Maranhao, Brazil", "tier": "marginal", "expected": "up", "lat": [-10.5, -2.0], "lon": [-48.5, -42.0]},
+    {"name": "California Central Valley (control: decline)", "tier": "marginal", "expected": "down", "lat": [34.5, 40.5], "lon": [-122.5, -118.0]},
+    {"name": "Iran / Middle East (control: decline)", "tier": "resolvable", "expected": "down", "lat": [28.0, 38.0], "lon": [44.0, 60.0]},
+    {"name": "North China Plain (control: decline)", "tier": "resolvable", "expected": "down", "lat": [34.0, 40.0], "lon": [113.0, 119.0]},
+    {"name": "Central Sahara (negative control)", "tier": "resolvable", "expected": "none", "lat": [20.0, 28.0], "lon": [-5.0, 25.0]}
+  ]
+}
