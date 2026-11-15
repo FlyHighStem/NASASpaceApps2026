@@ -150,3 +150,72 @@ Traceback (most recent call last):
   File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\.venv\Lib\site-packages\requests\adapters.py", line 729, in send
     raise ConnectionError(e, request=request)
 requests.exceptions.ConnectionError: HTTPSConnectionPool(host='firms.modaps.eosdis.nasa.gov', port=443): Max retries exceeded with url: /api/area/csv/ab9a86d53b587f9d91810f5af8219dc1/MODIS_SP/-125.0,30.0,-110.0,45.0/5/2002-01-01 (Caused by NameResolutionError("HTTPSConnection(host='firms.modaps.eosdis.nasa.gov', port=443): Failed to resolve 'firms.modaps.eosdis.nasa.gov' ([Errno 11001] getaddrinfo failed)"))
+
+=== Wildfire detections, intensity and peak season (NASA FIRMS)  [14:42:48] ===
+$ /Users/aanyatiwari/Desktop/counterpoint/.venv/bin/python3.13 features.py fires --map-key *** --bbox -125 30 -110 45 --start 2002 --end 2025 --jobs 9
+1754 FIRMS requests (MODIS_SP). If you see errors, check the source name in the FIRMS API docs.
+Traceback (most recent call last):
+  File "/Users/aanyatiwari/Desktop/counterpoint/features.py", line 630, in <module>
+    fires(a.csv, a.map_key, a.bbox, a.start, a.end, a.jobs)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aanyatiwari/Desktop/counterpoint/features.py", line 417, in fires
+    parts = [p for p in ex.map(one, days) if p is not None]
+                        ~~~~~~^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 619, in result_iterator
+    yield _result_or_cancel(fs.pop())
+          ~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 317, in _result_or_cancel
+    return fut.result(timeout)
+           ~~~~~~~~~~^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 456, in result
+    return self.__get_result()
+           ~~~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 401, in __get_result
+    raise self._exception
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/Users/aanyatiwari/Desktop/counterpoint/features.py", line 400, in one
+    raise RuntimeError(
+        f"FIRMS HTTP {response.status_code}: {response.text[:1000]}"
+    )
+RuntimeError: FIRMS HTTP 400: Invalid MAP_KEY.
+
+=== Independent cross-check vs NASA Hydrology Time Series (GES DISC)  [15:02:59] ===
+$ /Users/aanyatiwari/Desktop/counterpoint/.venv/bin/python3.13 crosscheck.py run
+  Northwest India (Punjab, Haryana, Rajasthan) / PRECTOTCORR: failed (only 0 data rows could be read; is this a monthly time series?)
+  Maranhao, Brazil / PRECTOTCORR: failed (only 0 data rows could be read; is this a monthly time series?)
+  California Central Valley (control: decline) / PRECTOTCORR: failed (only 0 data rows could be read; is this a monthly time series?)
+  Iran / Middle East (control: decline) / PRECTOTCORR: failed (only 0 data rows could be read; is this a monthly time series?)
+  North China Plain (control: decline) / PRECTOTCORR: failed (only 0 data rows could be read; is this a monthly time series?)
+  Central Sahara (negative control) / PRECTOTCORR: failed (only 0 data rows could be read; is this a monthly time series?)
+  Northwest India (Punjab, Haryana, Rajasthan) / T2M: failed (only 0 data rows could be read; is this a monthly time series?)
+  Maranhao, Brazil / T2M: failed (only 0 data rows could be read; is this a monthly time series?)
+  California Central Valley (control: decline) / T2M: failed (only 0 data rows could be read; is this a monthly time series?)
+  Iran / Middle East (control: decline) / T2M: failed (only 0 data rows could be read; is this a monthly time series?)
+  North China Plain (control: decline) / T2M: failed (only 0 data rows could be read; is this a monthly time series?)
+  Central Sahara (negative control) / T2M: failed (only 0 data rows could be read; is this a monthly time series?)
+No comparisons completed. Open the service URL for one point in a browser to check it still answers.
+
+=== Wildfire detections, intensity and peak season (NASA FIRMS)  [15:03:11] ===
+$ /Users/aanyatiwari/Desktop/counterpoint/.venv/bin/python3.13 features.py fires --map-key *** --bbox -125 30 -110 45 --start 2002 --end 2025 --jobs 9
+1754 FIRMS requests (MODIS_SP). If you see errors, check the source name in the FIRMS API docs.
+Traceback (most recent call last):
+  File "/Users/aanyatiwari/Desktop/counterpoint/features.py", line 630, in <module>
+    fires(a.csv, a.map_key, a.bbox, a.start, a.end, a.jobs)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aanyatiwari/Desktop/counterpoint/features.py", line 417, in fires
+    parts = [p for p in ex.map(one, days) if p is not None]
+                        ~~~~~~^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 619, in result_iterator
+    yield _result_or_cancel(fs.pop())
+          ~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 317, in _result_or_cancel
+    return fut.result(timeout)
+           ~~~~~~~~~~^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 451, in result
+    self._condition.wait(timeout)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/threading.py", line 359, in wait
+    waiter.acquire()
+    ~~~~~~~~~~~~~~^^
+KeyboardInterrupt

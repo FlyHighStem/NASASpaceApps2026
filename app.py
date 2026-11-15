@@ -21,5 +21,10 @@ methods = st.Page(
         title="Methods"
 )
 
-pg = st.navigation([home, data, methods, credits])
+crosscheck = st.Page(
+    "pages/cross_check.py",
+    title="Cross-check"
+)
+
+pg = st.navigation([home, data, methods, crosscheck, credits])
 pg.run()

@@ -55,6 +55,8 @@ STEPS = [
  dict(id="register", title="Make GRACE visible to the dashboard", core=True, done=register_done, cmd=lambda: [PY, "features.py", "register-grace"]),
  dict(id="power", title="Water and fire-weather variables (NASA POWER / MERRA-2)", core=False, done=lambda: has("PRECTOTCORR"),
       cmd=lambda: [PY, "features.py", "power", "--stride", os.environ.get("CP_POWER_STRIDE", "2"), "--jobs", JOBS]),
+ dict(id="crosscheck", title="Independent cross-check vs NASA Hydrology Time Series (GES DISC)", core=False, done=lambda: os.path.exists(f"{O}/crosscheck.csv"),
+      cmd=lambda: [PY, "crosscheck.py", "run"]),
  dict(id="fires", title="Wildfire detections, intensity and peak season (NASA FIRMS)", core=False, needs="firms", done=lambda: has("FIRE_COUNT"),
       cmd=lambda: [PY, "features.py", "fires", "--map-key", os.environ["FIRMS_MAP_KEY"], "--bbox", *_bbox(), "--start", "2002", "--end", "2025", "--jobs", JOBS]),
  dict(id="groundwater", title="Groundwater-style anomaly (GRACE minus GLDAS; large download)", core=False, needs="creds", optin="CP_GROUNDWATER", done=lambda: has("GW_ANOM"),

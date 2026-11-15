@@ -417,6 +417,26 @@ st.markdown(
     """
 )
 
+st.subheader("Independent cross-check")
+
+st.markdown(
+    """
+    To test that our trends are not an artefact of one data product or one
+    method, the same trend engine (annual means, Mann-Kendall, Theil-Sen) is
+    run, unchanged, on independent time series and the results are compared.
+    For each benchmark region, our NASA POWER (MERRA-2) precipitation and
+    temperature series are compared with GLDAS-Noah 2.1 monthly series
+    retrieved from NASA's GES DISC Hydrology Time Series service at the same
+    point. We report whether the two agree on trend direction, whether their
+    95% intervals overlap, and how closely their annual means move together.
+    Series exported by hand from Giovanni or KNMI Climate Explorer can be
+    compared the same way on the Cross-check page. Agreement between two
+    NASA products supports the climate signal, and disagreement is reported
+    rather than hidden. Both products are model based, so this is a
+    consistency check, not ground truth.
+    """
+)
+
 # ---------------------------------------------------------------------
 # 7. Limitations
 # ---------------------------------------------------------------------

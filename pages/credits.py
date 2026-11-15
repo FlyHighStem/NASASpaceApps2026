@@ -78,11 +78,29 @@ with st.expander("GRACE and GRACE-FO — Gravity Recovery and Climate Experiment
         with data products distributed through NASA's Physical Oceanography
         Distributed Active Archive Center (PO.DAAC).
 
+        **Product used:** JPL GRACE and GRACE-FO Mascon RL06.3 (CRI-filtered, version 4).
+
         **How it is used:** GRACE/GRACE-FO gravity observations are used to
         estimate changes in terrestrial water storage. These measurements
         represent changes in total water storage, not groundwater alone.
 
         **Data access:** [NASA PO.DAAC — GRACE and GRACE-FO](https://podaac.jpl.nasa.gov/GRACE)
+        """
+    )
+
+with st.expander("GES DISC Hydrology Time Series and GLDAS — Global Land Data Assimilation System"):
+    st.markdown(
+        """
+        **Provider:** NASA Goddard Earth Sciences Data and Information Services
+        Center (GES DISC) and NASA's Land Data Assimilation team.
+
+        **How it is used:** GLDAS-Noah 2.1 monthly series, retrieved through the
+        Hydrology Time Series service, are used as an independent cross-check of
+        our precipitation and temperature trends. GLDAS soil moisture, snow and
+        canopy water are also subtracted from GRACE to form the groundwater-style
+        anomaly, which still contains surface water and reservoirs.
+
+        **Data access:** [NASA Hydrology Time Series](https://disc.gsfc.nasa.gov/information/tools?title=Hydrology%20Time%20Series)
         """
     )
 
@@ -151,6 +169,8 @@ technology_items = [
     ("NumPy", "Numerical computing"),
     ("Plotly", "Interactive charts and geographic visualizations"),
     ("Earthaccess", "Access to supported NASA Earthdata resources"),
+    ("SciPy and xarray", "Statistical functions and NetCDF data handling"),
+    ("Requests", "Retrieval from NASA POWER, FIRMS and Hydrology Time Series web services"),
 ]
 
 for technology, purpose in technology_items:

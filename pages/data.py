@@ -277,7 +277,7 @@ else:
     )
 
 with st.expander("Other project output files"):
-    for filename in ("results.geojson", "sources.json", "benchmark_regions.json"):
+    for filename in ("results.geojson", "sources.json", "benchmark_regions.json", "crosscheck.csv"):
         candidates = [
             OUTPUT_DIR / filename,
             PROJECT_DIR / "data" / filename,
