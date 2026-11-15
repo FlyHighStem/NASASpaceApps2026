@@ -1,0 +1,41 @@
+
+=== Make GRACE visible to the dashboard  [20:05:39] ===
+$ C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\.venv\Scripts\python.exe features.py register-grace
+registered grace_lwe
+
+=== Water and fire-weather variables (NASA POWER / MERRA-2)  [20:05:41] ===
+$ C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\.venv\Scripts\python.exe features.py power --stride 2 --jobs 15
+fetching 520 points from NASA POWER (cached; safe to rerun)
+fetched 520/520
+  analysed 0/520
+  analysed 200/520
+  analysed 400/520
+PRECTOTCORR: 520 units | grades {'C': 395, 'A': 115, 'B': 10} | regions 114 | mirror pairs 498
+  analysed 0/520
+  analysed 200/520
+  analysed 400/520
+GWETTOP: 520 units | grades {'C': 357, 'A': 138, 'B': 25} | regions 136 | mirror pairs 788
+  analysed 0/520
+  analysed 200/520
+  analysed 400/520
+GWETROOT: 518 units | grades {'C': 370, 'A': 123, 'B': 25} | regions 123 | mirror pairs 712
+  analysed 0/520
+  analysed 200/520
+  analysed 400/520
+EVLAND: 518 units | grades {'C': 368, 'A': 132, 'B': 18} | regions 138 | mirror pairs 749
+  analysed 0/520
+  analysed 200/520
+  analysed 400/520
+T2M: 520 units | grades {'C': 323, 'A': 186, 'B': 11} | regions 154 | mirror pairs 521
+  analysed 0/520
+  analysed 200/520
+  analysed 400/520
+RH2M: 520 units | grades {'C': 420, 'A': 94, 'B': 6} | regions 89 | mirror pairs 300
+  analysed 0/520
+  analysed 200/520
+  analysed 400/520
+WS2M: 520 units | grades {'C': 470, 'A': 46, 'B': 4} | regions 50 | mirror pairs 76
+  analysed 0/520
+  analysed 200/520
+  analysed 400/520
+VPD: 520 units | grades {'C': 428, 'A': 86, 'B': 6} | regions 83 | mirror pairs 276
