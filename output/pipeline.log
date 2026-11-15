@@ -662,3 +662,298 @@ Traceback (most recent call last):
   File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/earthaccess/store.py", line 932, in _download_file
     raise EulaNotAccepted(msg)
 earthaccess.exceptions.EulaNotAccepted: Eula Acceptance Failure for https://data.gesdisc.earthdata.nasa.gov/data/GLDAS/GLDAS_NOAH025_M.2.1/2002/GLDAS_NOAH025_M.A200204.021.nc4
+
+=== Wildfire detections, intensity and peak season (NASA FIRMS)  [07:37:14] ===
+$ /Users/aanyatiwari/Desktop/counterpoint/.venv/bin/python3.13 features.py fires --map-key *** --bbox -125 30 -110 45 --start 2002 --end 2025 --jobs 9
+1754 FIRMS requests (MODIS_SP). If you see errors, check the source name in the FIRMS API docs.
+Traceback (most recent call last):
+  File "/Users/aanyatiwari/Desktop/counterpoint/features.py", line 622, in <module>
+    fires(a.csv, a.map_key, a.bbox, a.start, a.end, a.jobs)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aanyatiwari/Desktop/counterpoint/features.py", line 409, in fires
+    parts = [p for p in ex.map(one, days) if p is not None]
+                        ~~~~~~^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 619, in result_iterator
+    yield _result_or_cancel(fs.pop())
+          ~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 317, in _result_or_cancel
+    return fut.result(timeout)
+           ~~~~~~~~~~^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 456, in result
+    return self.__get_result()
+           ~~~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 401, in __get_result
+    raise self._exception
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/Users/aanyatiwari/Desktop/counterpoint/features.py", line 392, in one
+    raise RuntimeError(
+        f"FIRMS HTTP {response.status_code}: {response.text[:1000]}"
+    )
+RuntimeError: FIRMS HTTP 400: Invalid MAP_KEY.
+
+=== Make GRACE visible to the dashboard  [07:43:21] ===
+$ /Users/aanyatiwari/Desktop/counterpoint/.venv/bin/python3.13 features.py register-grace
+registered grace_lwe
+
+=== Water and fire-weather variables (NASA POWER / MERRA-2)  [07:43:23] ===
+$ /Users/aanyatiwari/Desktop/counterpoint/.venv/bin/python3.13 features.py power --stride 2 --jobs 9
+fetching 520 points from NASA POWER (cached; safe to rerun)
+fetched 520/520
+  analysed 0/520
+  analysed 200/520
+  analysed 400/520
+PRECTOTCORR: 520 units | grades {'C': 395, 'A': 115, 'B': 10} | regions 114 | mirror pairs 498
+  analysed 0/520
+  analysed 200/520
+  analysed 400/520
+GWETTOP: 520 units | grades {'C': 357, 'A': 138, 'B': 25} | regions 136 | mirror pairs 788
+  analysed 0/520
+  analysed 200/520
+  analysed 400/520
+GWETROOT: 518 units | grades {'C': 370, 'A': 123, 'B': 25} | regions 123 | mirror pairs 712
+  analysed 0/520
+  analysed 200/520
+  analysed 400/520
+EVLAND: 518 units | grades {'C': 368, 'A': 132, 'B': 18} | regions 138 | mirror pairs 749
+  analysed 0/520
+  analysed 200/520
+  analysed 400/520
+T2M: 520 units | grades {'C': 323, 'A': 186, 'B': 11} | regions 154 | mirror pairs 521
+  analysed 0/520
+  analysed 200/520
+  analysed 400/520
+RH2M: 520 units | grades {'C': 420, 'A': 94, 'B': 6} | regions 89 | mirror pairs 300
+  analysed 0/520
+  analysed 200/520
+  analysed 400/520
+WS2M: 520 units | grades {'C': 470, 'A': 46, 'B': 4} | regions 50 | mirror pairs 76
+  analysed 0/520
+  analysed 200/520
+  analysed 400/520
+VPD: 520 units | grades {'C': 428, 'A': 86, 'B': 6} | regions 83 | mirror pairs 276
+
+=== Wildfire detections, intensity and peak season (NASA FIRMS)  [07:44:11] ===
+$ /Users/aanyatiwari/Desktop/counterpoint/.venv/bin/python3.13 features.py fires --map-key *** --bbox -125 30 -110 45 --start 2002 --end 2025 --jobs 9
+1754 FIRMS requests (MODIS_SP). If you see errors, check the source name in the FIRMS API docs.
+Traceback (most recent call last):
+  File "/Users/aanyatiwari/Desktop/counterpoint/features.py", line 630, in <module>
+    fires(a.csv, a.map_key, a.bbox, a.start, a.end, a.jobs)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aanyatiwari/Desktop/counterpoint/features.py", line 417, in fires
+    parts = [p for p in ex.map(one, days) if p is not None]
+                        ~~~~~~^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 619, in result_iterator
+    yield _result_or_cancel(fs.pop())
+          ~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 317, in _result_or_cancel
+    return fut.result(timeout)
+           ~~~~~~~~~~^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 456, in result
+    return self.__get_result()
+           ~~~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 401, in __get_result
+    raise self._exception
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/Users/aanyatiwari/Desktop/counterpoint/features.py", line 400, in one
+    raise RuntimeError(
+        f"FIRMS HTTP {response.status_code}: {response.text[:1000]}"
+    )
+RuntimeError: FIRMS HTTP 400: Invalid MAP_KEY.
+
+=== Wildfire detections, intensity and peak season (NASA FIRMS)  [08:08:57] ===
+$ /Users/aanyatiwari/Desktop/counterpoint/.venv/bin/python3.13 features.py fires --map-key *** --bbox -125 30 -110 45 --start 2002 --end 2025 --jobs 9
+1754 FIRMS requests (MODIS_SP). If you see errors, check the source name in the FIRMS API docs.
+Traceback (most recent call last):
+  File "/Users/aanyatiwari/Desktop/counterpoint/features.py", line 630, in <module>
+    fires(a.csv, a.map_key, a.bbox, a.start, a.end, a.jobs)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aanyatiwari/Desktop/counterpoint/features.py", line 417, in fires
+    parts = [p for p in ex.map(one, days) if p is not None]
+                        ~~~~~~^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 619, in result_iterator
+    yield _result_or_cancel(fs.pop())
+          ~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 317, in _result_or_cancel
+    return fut.result(timeout)
+           ~~~~~~~~~~^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 456, in result
+    return self.__get_result()
+           ~~~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 401, in __get_result
+    raise self._exception
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/Users/aanyatiwari/Desktop/counterpoint/features.py", line 400, in one
+    raise RuntimeError(
+        f"FIRMS HTTP {response.status_code}: {response.text[:1000]}"
+    )
+RuntimeError: FIRMS HTTP 400: Invalid MAP_KEY.
+
+=== Wildfire detections, intensity and peak season (NASA FIRMS)  [08:14:13] ===
+$ /Users/aanyatiwari/Desktop/counterpoint/.venv/bin/python3.13 features.py fires --map-key *** --bbox -125 30 -110 45 --start 2002 --end 2025 --jobs 9
+1754 FIRMS requests (MODIS_SP). If you see errors, check the source name in the FIRMS API docs.
+Traceback (most recent call last):
+  File "/Users/aanyatiwari/Desktop/counterpoint/features.py", line 630, in <module>
+    fires(a.csv, a.map_key, a.bbox, a.start, a.end, a.jobs)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aanyatiwari/Desktop/counterpoint/features.py", line 417, in fires
+    parts = [p for p in ex.map(one, days) if p is not None]
+                        ~~~~~~^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 619, in result_iterator
+    yield _result_or_cancel(fs.pop())
+          ~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 317, in _result_or_cancel
+    return fut.result(timeout)
+           ~~~~~~~~~~^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 456, in result
+    return self.__get_result()
+           ~~~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 401, in __get_result
+    raise self._exception
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/Users/aanyatiwari/Desktop/counterpoint/features.py", line 400, in one
+    raise RuntimeError(
+        f"FIRMS HTTP {response.status_code}: {response.text[:1000]}"
+    )
+RuntimeError: FIRMS HTTP 400: Invalid MAP_KEY.
+
+=== Wildfire detections, intensity and peak season (NASA FIRMS)  [08:19:09] ===
+$ /Users/aanyatiwari/Desktop/counterpoint/.venv/bin/python3.13 features.py fires --map-key *** --bbox -125 30 -110 45 --start 2002 --end 2025 --jobs 9
+1754 FIRMS requests (MODIS_SP). If you see errors, check the source name in the FIRMS API docs.
+Traceback (most recent call last):
+  File "/Users/aanyatiwari/Desktop/counterpoint/features.py", line 630, in <module>
+    fires(a.csv, a.map_key, a.bbox, a.start, a.end, a.jobs)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aanyatiwari/Desktop/counterpoint/features.py", line 417, in fires
+    parts = [p for p in ex.map(one, days) if p is not None]
+                        ~~~~~~^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 619, in result_iterator
+    yield _result_or_cancel(fs.pop())
+          ~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 317, in _result_or_cancel
+    return fut.result(timeout)
+           ~~~~~~~~~~^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 456, in result
+    return self.__get_result()
+           ~~~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 401, in __get_result
+    raise self._exception
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/Users/aanyatiwari/Desktop/counterpoint/features.py", line 400, in one
+    raise RuntimeError(
+        f"FIRMS HTTP {response.status_code}: {response.text[:1000]}"
+    )
+RuntimeError: FIRMS HTTP 400: Invalid MAP_KEY.
+
+=== Wildfire detections, intensity and peak season (NASA FIRMS)  [08:22:56] ===
+$ /Users/aanyatiwari/Desktop/counterpoint/.venv/bin/python features.py fires --map-key *** --bbox -125 30 -110 45 --start 2002 --end 2025 --jobs 9
+Traceback (most recent call last):
+  File "/Users/aanyatiwari/Desktop/counterpoint/features.py", line 19, in <module>
+    import counterpoint as cp
+  File "/Users/aanyatiwari/Desktop/counterpoint/counterpoint.py", line 4, in <module>
+    import argparse, json, hashlib, os, datetime, functools, numpy as np, pandas as pd, scipy.stats as st
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/scipy/stats/__init__.py", line 600, in <module>
+    from ._stats_py import *
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/scipy/stats/_stats_py.py", line 39, in <module>
+    from scipy import sparse
+  File "<frozen importlib._bootstrap>", line 1412, in _handle_fromlist
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/scipy/__init__.py", line 137, in __getattr__
+    return _importlib.import_module(f'scipy.{name}')
+           ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/importlib/__init__.py", line 88, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/scipy/sparse/__init__.py", line 251, in <module>
+    from ._csr import *
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/scipy/sparse/_csr.py", line 15, in <module>
+    from ._compressed import _cs_matrix
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/scipy/sparse/_compressed.py", line 8, in <module>
+    from scipy._lib._util import _prune_array, copy_if_needed
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/scipy/_lib/_util.py", line 16, in <module>
+    from scipy._lib._array_api import (Array, array_namespace, is_lazy_array, is_numpy,
+                                       is_marray, xp_size, xp_result_device, xp_result_type)
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/scipy/_lib/_array_api.py", line 24, in <module>
+    from scipy._external.array_api_compat import (
+    ...<17 lines>...
+    )
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/scipy/_external/array_api_compat/numpy/__init__.py", line 9, in <module>
+    __all__ = clone_module("numpy", globals())
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/scipy/_external/array_api_compat/_internal.py", line 64, in clone_module
+    exec(f"from {mod.__name__} import *", objs)
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<string>", line 1, in <module>
+  File "<frozen importlib._bootstrap>", line 1410, in _handle_fromlist
+  File "<frozen importlib._bootstrap>", line 1412, in _handle_fromlist
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/numpy/__init__.py", line 735, in __getattr__
+    import numpy.f2py as f2py
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/numpy/f2py/__init__.py", line 19, in <module>
+    from . import diagnose, f2py2e
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 1022, in exec_module
+  File "<frozen importlib._bootstrap_external>", line 1118, in get_code
+  File "<frozen importlib._bootstrap_external>", line 1217, in get_data
+KeyboardInterrupt
+
+=== Wildfire detections, intensity and peak season (NASA FIRMS)  [08:23:08] ===
+$ /Users/aanyatiwari/Desktop/counterpoint/.venv/bin/python3.13 features.py fires --map-key *** --bbox -125 30 -110 45 --start 2002 --end 2025 --jobs 9
+1754 FIRMS requests (MODIS_SP). If you see errors, check the source name in the FIRMS API docs.
+Traceback (most recent call last):
+  File "/Users/aanyatiwari/Desktop/counterpoint/features.py", line 630, in <module>
+    fires(a.csv, a.map_key, a.bbox, a.start, a.end, a.jobs)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aanyatiwari/Desktop/counterpoint/features.py", line 417, in fires
+    parts = [p for p in ex.map(one, days) if p is not None]
+                        ~~~~~~^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 619, in result_iterator
+    yield _result_or_cancel(fs.pop())
+          ~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 317, in _result_or_cancel
+    return fut.result(timeout)
+           ~~~~~~~~~~^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 456, in result
+    return self.__get_result()
+           ~~~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 401, in __get_result
+    raise self._exception
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/Users/aanyatiwari/Desktop/counterpoint/features.py", line 400, in one
+    raise RuntimeError(
+        f"FIRMS HTTP {response.status_code}: {response.text[:1000]}"
+    )
+RuntimeError: FIRMS HTTP 400: Invalid MAP_KEY.
+
+=== Wildfire detections, intensity and peak season (NASA FIRMS)  [08:25:43] ===
+$ /Users/aanyatiwari/Desktop/counterpoint/.venv/bin/python3.13 features.py fires --map-key *** --bbox -125 30 -110 45 --start 2002 --end 2025 --jobs 9
+1754 FIRMS requests (MODIS_SP). If you see errors, check the source name in the FIRMS API docs.
+Traceback (most recent call last):
+  File "/Users/aanyatiwari/Desktop/counterpoint/features.py", line 630, in <module>
+    fires(a.csv, a.map_key, a.bbox, a.start, a.end, a.jobs)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aanyatiwari/Desktop/counterpoint/features.py", line 417, in fires
+    parts = [p for p in ex.map(one, days) if p is not None]
+                        ~~~~~~^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 619, in result_iterator
+    yield _result_or_cancel(fs.pop())
+          ~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 317, in _result_or_cancel
+    return fut.result(timeout)
+           ~~~~~~~~~~^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 456, in result
+    return self.__get_result()
+           ~~~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 401, in __get_result
+    raise self._exception
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/Users/aanyatiwari/Desktop/counterpoint/features.py", line 400, in one
+    raise RuntimeError(
+        f"FIRMS HTTP {response.status_code}: {response.text[:1000]}"
+    )
+RuntimeError: FIRMS HTTP 400: Invalid MAP_KEY.
