@@ -21,5 +21,5 @@ methods = st.Page(
         title="Methods"
 )
 
-pg = st.navigation([home, data, credits, methods])
+pg = st.navigation([home, data, methods, credits])
 pg.run()

@@ -2,3 +2,151 @@
 === Wildfire detections, intensity and peak season (NASA FIRMS)  [12:53:01] ===
 $ C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\.venv\Scripts\python.exe features.py fires --map-key *** --bbox -125 30 -110 45 --start 2002 --end 2025 --jobs 15
 1754 FIRMS requests (MODIS_SP). If you see errors, check the source name in the FIRMS API docs.
+Traceback (most recent call last):
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\features.py", line 630, in <module>
+    fires(a.csv, a.map_key, a.bbox, a.start, a.end, a.jobs)
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\features.py", line 417, in fires
+    parts = [p for p in ex.map(one, days) if p is not None]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\features.py", line 417, in <listcomp>
+    parts = [p for p in ex.map(one, days) if p is not None]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\_base.py", line 619, in result_iterator
+    yield _result_or_cancel(fs.pop())
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\_base.py", line 317, in _result_or_cancel
+    return fut.result(timeout)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\_base.py", line 449, in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\_base.py", line 401, in __get_result
+    raise self._exception
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\features.py", line 400, in one
+    raise RuntimeError(
+RuntimeError: FIRMS HTTP 400: Exceeding allowed transaction limit.
+
+=== Wildfire detections, intensity and peak season (NASA FIRMS)  [13:11:14] ===
+$ C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\.venv\Scripts\python.exe features.py fires --map-key *** --bbox -125 30 -110 45 --start 2002 --end 2025 --jobs 15
+1754 FIRMS requests (MODIS_SP). If you see errors, check the source name in the FIRMS API docs.
+Traceback (most recent call last):
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\features.py", line 630, in <module>
+    fires(a.csv, a.map_key, a.bbox, a.start, a.end, a.jobs)
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\features.py", line 417, in fires
+    parts = [p for p in ex.map(one, days) if p is not None]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\features.py", line 417, in <listcomp>
+    parts = [p for p in ex.map(one, days) if p is not None]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\_base.py", line 619, in result_iterator
+    yield _result_or_cancel(fs.pop())
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\_base.py", line 317, in _result_or_cancel
+    return fut.result(timeout)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\_base.py", line 456, in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\_base.py", line 401, in __get_result
+    raise self._exception
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\features.py", line 400, in one
+    raise RuntimeError(
+RuntimeError: FIRMS HTTP 400: Invalid MAP_KEY.
+
+=== Wildfire detections, intensity and peak season (NASA FIRMS)  [14:35:19] ===
+$ C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\.venv\Scripts\python.exe features.py fires --map-key *** --bbox -125 30 -110 45 --start 2002 --end 2025 --jobs 15
+1754 FIRMS requests (MODIS_SP). If you see errors, check the source name in the FIRMS API docs.
+Traceback (most recent call last):
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\.venv\Lib\site-packages\urllib3\connection.py", line 239, in _new_conn
+    sock = connection.create_connection(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\.venv\Lib\site-packages\urllib3\util\connection.py", line 60, in create_connection
+    for res in socket.getaddrinfo(host, port, family, socket.SOCK_STREAM):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\socket.py", line 962, in getaddrinfo
+    for res in _socket.getaddrinfo(host, port, family, type, proto, flags):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+socket.gaierror: [Errno 11001] getaddrinfo failed
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\.venv\Lib\site-packages\urllib3\connectionpool.py", line 793, in urlopen
+    response = self._make_request(
+               ^^^^^^^^^^^^^^^^^^^
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\.venv\Lib\site-packages\urllib3\connectionpool.py", line 494, in _make_request
+    raise new_e
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\.venv\Lib\site-packages\urllib3\connectionpool.py", line 470, in _make_request
+    self._validate_conn(conn)
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\.venv\Lib\site-packages\urllib3\connectionpool.py", line 1125, in _validate_conn
+    conn.connect()
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\.venv\Lib\site-packages\urllib3\connection.py", line 827, in connect
+    self.sock = sock = self._new_conn()
+                       ^^^^^^^^^^^^^^^^
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\.venv\Lib\site-packages\urllib3\connection.py", line 246, in _new_conn
+    raise NameResolutionError(self.host, self, e) from e
+urllib3.exceptions.NameResolutionError: HTTPSConnection(host='firms.modaps.eosdis.nasa.gov', port=443): Failed to resolve 'firms.modaps.eosdis.nasa.gov' ([Errno 11001] getaddrinfo failed)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\.venv\Lib\site-packages\requests\adapters.py", line 696, in send
+    resp = conn.urlopen(
+           ^^^^^^^^^^^^^
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\.venv\Lib\site-packages\urllib3\connectionpool.py", line 847, in urlopen
+    retries = retries.increment(
+              ^^^^^^^^^^^^^^^^^^
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\.venv\Lib\site-packages\urllib3\util\retry.py", line 555, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='firms.modaps.eosdis.nasa.gov', port=443): Max retries exceeded with url: /api/area/csv/ab9a86d53b587f9d91810f5af8219dc1/MODIS_SP/-125.0,30.0,-110.0,45.0/5/2002-01-01 (Caused by NameResolutionError("HTTPSConnection(host='firms.modaps.eosdis.nasa.gov', port=443): Failed to resolve 'firms.modaps.eosdis.nasa.gov' ([Errno 11001] getaddrinfo failed)"))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\features.py", line 630, in <module>
+    fires(a.csv, a.map_key, a.bbox, a.start, a.end, a.jobs)
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\features.py", line 417, in fires
+    parts = [p for p in ex.map(one, days) if p is not None]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\features.py", line 417, in <listcomp>
+    parts = [p for p in ex.map(one, days) if p is not None]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\_base.py", line 619, in result_iterator
+    yield _result_or_cancel(fs.pop())
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\_base.py", line 317, in _result_or_cancel
+    return fut.result(timeout)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\_base.py", line 456, in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\_base.py", line 401, in __get_result
+    raise self._exception
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\features.py", line 398, in one
+    response = requests.get(url, timeout=120)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\.venv\Lib\site-packages\requests\api.py", line 87, in get
+    return request("get", url, params=params, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\.venv\Lib\site-packages\requests\api.py", line 71, in request
+    return session.request(method=method, url=url, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\.venv\Lib\site-packages\requests\sessions.py", line 651, in request
+    resp = self.send(prep, **send_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\.venv\Lib\site-packages\requests\sessions.py", line 784, in send
+    r = adapter.send(request, **kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\.venv\Lib\site-packages\requests\adapters.py", line 729, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError: HTTPSConnectionPool(host='firms.modaps.eosdis.nasa.gov', port=443): Max retries exceeded with url: /api/area/csv/ab9a86d53b587f9d91810f5af8219dc1/MODIS_SP/-125.0,30.0,-110.0,45.0/5/2002-01-01 (Caused by NameResolutionError("HTTPSConnection(host='firms.modaps.eosdis.nasa.gov', port=443): Failed to resolve 'firms.modaps.eosdis.nasa.gov' ([Errno 11001] getaddrinfo failed)"))
