@@ -108,7 +108,7 @@ fig.update_geos(
     showland=True,
     landcolor="#FFFFFF",
     showocean=True,
-    oceancolor="#FFFFFF",
+    oceancolor="#D5F3FC",
     showcountries=True,
     countrycolor="#B9B9B9",
     countrywidth=0.8,
@@ -264,7 +264,7 @@ else:
             showland=True,
             landcolor="#FFFFFF",
             showocean=True,
-            oceancolor="#FFFFFF",
+            oceancolor="#D5F3FC",
             showcountries=True,
             countrycolor="#B9B9B9"
         )
