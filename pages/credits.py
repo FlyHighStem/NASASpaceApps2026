@@ -26,7 +26,7 @@ def load_css():
 load_css()
 
 if st.button("← Back to Main Dashboard", key="back_home"):
-    st.switch_page("app.py")
+    st.switch_page("home.py")
 
 
 # ---------------------------------------------------------------------
@@ -49,18 +49,11 @@ st.markdown(
 
 st.header("Our Team")
 
-st.markdown(
-    """
-    Add your confirmed team members and roles below. Replace the placeholders
-    with the names and contributions your team wants publicly credited.
-    """
-)
-
 team = [
-    ("[Team Member 1]", "[Role / contribution]"),
-    ("[Team Member 2]", "[Role / contribution]"),
-    ("[Team Member 3]", "[Role / contribution]"),
-    ("[Team Member 4]", "[Role / contribution]"),
+    ("Aanya Tiwari", "Project Lead/Backend/Pipeline"),
+    ("Dat Hoang Vien", "Frontend/DevOps"),
+    ("Swapnil Tiwari", "Strategist"),
+    ("Tuhina Tiwari", "Coordinator"),
 ]
 
 for name, role in team:

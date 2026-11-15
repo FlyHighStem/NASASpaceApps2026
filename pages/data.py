@@ -31,7 +31,7 @@ def load_css():
 load_css()
 
 if st.button("← Back to Main Dashboard", key="back_home"):
-    st.switch_page("app.py")
+    st.switch_page("home.py")
 
 
 st.title("📊 Data Explorer")
@@ -56,7 +56,7 @@ def read_csv_if_available(path, **kwargs):
 
 
 @st.cache_data
-def load_feature(folder_string):
+def load_feature(folder_string, stamp):
     """Load all available outputs for one feature folder."""
     folder = Path(folder_string)
 
@@ -86,7 +86,7 @@ def feature_description(feature_key):
     item = ft.CATALOG.get(feature_key, {})
     if isinstance(item, dict):
         return (
-            item.get("description")
+            item.get("desc")
             or item.get("label")
             or item.get("name")
             or "Processed Earth-system feature."
@@ -115,14 +115,15 @@ if not available_features:
 selected_feature = st.selectbox(
     "Choose a processed feature",
     available_features,
-    format_func=lambda key: key.replace("_", " ").title(),
+    format_func=lambda key: ft.CATALOG.get(key, {}).get("label", key),
 )
 
 results, regions, pairs, series, meta = load_feature(
-    str(VARS_DIR / selected_feature)
+    str(VARS_DIR / selected_feature),
+    (VARS_DIR / selected_feature / "results.csv").stat().st_mtime,  # reload when a run rewrites the files
 )
 
-st.subheader(selected_feature.replace("_", " ").title())
+st.subheader(ft.CATALOG.get(selected_feature, {}).get("label", selected_feature))
 st.write(feature_description(selected_feature))
 
 if meta:
@@ -151,7 +152,7 @@ st.caption("The main trend-analysis output for the selected feature.")
 if results.empty:
     st.info("No rows are available in results.csv for this feature.")
 else:
-    st.dataframe(results, use_container_width=True, hide_index=True)
+    st.dataframe(results, width="stretch", hide_index=True)
     st.download_button(
         "Download results.csv",
         data=results.to_csv(index=False).encode("utf-8"),
@@ -170,7 +171,7 @@ st.subheader("Regional Results")
 if regions.empty:
     st.info("No regional summary is available for this feature.")
 else:
-    st.dataframe(regions, use_container_width=True, hide_index=True)
+    st.dataframe(regions, width="stretch", hide_index=True)
     st.download_button(
         "Download regions.csv",
         data=regions.to_csv(index=False).encode("utf-8"),
@@ -189,7 +190,7 @@ st.subheader("Mirror Cases")
 if pairs.empty:
     st.info("No mirror-pair records are available for this feature.")
 else:
-    st.dataframe(pairs, use_container_width=True, hide_index=True)
+    st.dataframe(pairs, width="stretch", hide_index=True)
     st.download_button(
         "Download pairs.csv",
         data=pairs.to_csv(index=False).encode("utf-8"),
@@ -203,12 +204,16 @@ else:
 # Time series
 # ---------------------------------------------------------------------
 st.divider()
-st.subheader("Annual / Time-Series Data")
+st.subheader("Monthly Time Series")
 
 if series.empty:
     st.info("No time-series data is available for this feature.")
 else:
-    st.dataframe(series, use_container_width=True)
+    st.caption(
+        "Raw monthly values, one column per unit id (the seasonal cycle is not removed here). "
+        "The statistics use deseasonalised annual means of these series."
+    )
+    st.dataframe(series, width="stretch")
     st.download_button(
         "Download series.csv",
         data=series.to_csv().encode("utf-8"),
@@ -220,7 +225,11 @@ else:
     numeric_columns = series.select_dtypes(include="number").columns.tolist()
     if numeric_columns:
         st.markdown("**Quick time-series view**")
-        st.line_chart(series[numeric_columns])
+        picked = st.multiselect(
+            "Units to plot (column = unit id)", numeric_columns, default=numeric_columns[:3]
+        )
+        if picked:
+            st.line_chart(series[picked])
 
 
 # ---------------------------------------------------------------------
@@ -229,11 +238,20 @@ else:
 st.divider()
 st.subheader("Benchmark Data")
 
+try:
+    _sm = json.loads((OUTPUT_DIR / "sources.json").read_text(encoding="utf-8"))
+    if _sm.get("benchmark_frozen"):
+        st.success("Region list was FROZEN before this run.")
+    else:
+        st.warning("Region list was NOT frozen before this run: scorecard is exploratory.")
+except (OSError, ValueError):
+    pass
+
 benchmark_candidates = [
     OUTPUT_DIR / "benchmark.csv",
     VARS_DIR / selected_feature / "benchmark.csv",
 ]
-benchmark_path = next(
+benchmark_path = None if selected_feature != "grace_lwe" else next(
     (path for path in benchmark_candidates if path.exists() and path.stat().st_size > 5),
     None,
 )
@@ -243,7 +261,7 @@ if benchmark_path:
     if benchmark.empty:
         st.info("The benchmark file exists but contains no readable rows.")
     else:
-        st.dataframe(benchmark, use_container_width=True, hide_index=True)
+        st.dataframe(benchmark, width="stretch", hide_index=True)
         st.download_button(
             "Download benchmark.csv",
             data=benchmark.to_csv(index=False).encode("utf-8"),
@@ -252,7 +270,11 @@ if benchmark_path:
             key="download_benchmark",
         )
 else:
-    st.info("No benchmark.csv file was found in the expected output locations.")
+    st.info(
+        "The benchmark scores the GRACE analysis only. Choose 'Water storage (GRACE)' above to see it."
+        if selected_feature != "grace_lwe"
+        else "No benchmark.csv file was found in the expected output locations."
+    )
 
 with st.expander("Other project output files"):
     for filename in ("results.geojson", "sources.json", "benchmark_regions.json"):
