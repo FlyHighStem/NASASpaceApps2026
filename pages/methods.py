@@ -1,4 +1,4 @@
-
+import json
 from pathlib import Path
 
 import streamlit as st
@@ -88,8 +88,11 @@ with st.expander("Overview of the analysis process", expanded=True):
         2. **Seasonal adjustment:** Remove the average monthly seasonal
            cycle from monthly observations.
 
-        3. **Annual aggregation:** Calculate annual averages for the
-           statistical trend tests.
+        3. **Annual aggregation:** Calculate annual averages and use
+           them for the statistical trend tests. A year counts only if it
+           has at least 9 months of data (peak-season fire series use their
+           3 peak months), so the years inside the GRACE to GRACE-FO gap
+           normally drop out.
 
         4. **Trend estimation:** Estimate the direction and magnitude
            of change using the Theil-Sen estimator.
@@ -134,7 +137,7 @@ st.markdown(
     start years and end years rather than relying exclusively on the
     complete observation period.
 
-    Only windows containing at least **10 years** are considered.
+    Only windows containing at least **10 annual means** are considered (the full record is one of them).
     For every eligible window, the Theil-Sen estimator calculates
     a trend slope. Its direction is then compared with the direction
     of the overall trend.
@@ -224,9 +227,11 @@ grade_data = [
         "distinguish the estimated trend from natural variability."
     ),
     (
-        "D — Unreliable",
-        "The trend may be affected by a discontinuity associated with "
-        "the GRACE to GRACE-FO mission transition."
+        "D — Unreliable (possible gap artifact)",
+        "GRACE-based series only. A step at the GRACE to GRACE-FO gap "
+        "is statistically significant, so the trend may be an instrument "
+        "offset. It could also be a real change that happens to straddle "
+        "the gap: this is a caution flag, not proof of an artifact."
     ),
 ]
 
@@ -238,21 +243,19 @@ st.subheader("What determines a grade?")
 
 st.markdown(
     """
-    The classification considers three main aspects:
+    The rules are applied in this order, and the first one that matches wins:
 
-    - **Statistical significance:** Whether the observed trend passes
-      the Mann-Kendall significance test after false-discovery-rate
-      correction.
+    1. **D:** the gap-step test gives p < 0.01 **and** the plain trend test
+       gives p < 0.05. Only GRACE-based series can receive D; other
+       features have no gap, so they are graded A, B or C.
+    2. **C:** the false-discovery-rate q-value is 0.10 or more.
+    3. **A:** q < 0.10 and the trend keeps its sign in at least 80% of
+       start/end windows.
+    4. **B:** q < 0.10 but fewer than 80% of windows agree.
 
-    - **Temporal robustness:** Whether different start-year and
-      end-year windows generally agree on the direction of change.
-
-    - **Measurement reliability:** Whether the GRACE mission transition
-      introduces a potential discontinuity that could be mistaken
-      for a genuine environmental trend.
-
-    These checks provide complementary information rather than
-    relying on the magnitude of the estimated slope alone.
+    Because D is checked first, a unit can be graded D even when it would
+    otherwise be A or B. That is intentional: the grade says "look at the
+    gap before trusting this", not "this trend is false".
     """
 )
 
@@ -287,8 +290,10 @@ with st.expander("Mann-Kendall Test", expanded=True):
         observations to follow a normal distribution.
 
         Counterpoint applies the test to annual averages rather than
-        directly to monthly observations, helping reduce the influence
-        of strong month-to-month temporal dependence.
+        directly to monthly observations, which removes most of the
+        month-to-month dependence. Year-to-year dependence is not
+        corrected, so p-values can be somewhat optimistic for slowly
+        varying series. The test is tie-corrected.
 
         **Output:** A p-value representing the statistical evidence
         against the absence of a monotonic trend.
@@ -319,7 +324,10 @@ with st.expander("Benjamini-Hochberg Correction"):
 
         The Benjamini-Hochberg procedure adjusts for multiple comparisons
         by controlling the expected proportion of false discoveries
-        among results declared significant.
+        among results declared significant. It is applied across the
+        units of each feature, and again across merged regions.
+        Neighbouring units are spatially correlated, so q-values are
+        approximate.
 
         Counterpoint uses a false-discovery-rate threshold of:
 
@@ -330,17 +338,20 @@ with st.expander("Benjamini-Hochberg Correction"):
 with st.expander("GRACE Mission-Gap Test"):
     st.markdown(
         """
-        The GRACE and GRACE-FO satellite missions have a gap in
-        observations during their transition.
+        The GRACE and GRACE-FO satellites are separated by a gap of
+        roughly a year (mid-2017 to mid-2018), and the two instruments
+        can differ slightly in offset.
 
-        A sudden discontinuity around this period could potentially
-        resemble a genuine environmental trend.
+        For GRACE-based series, Counterpoint fits the annual means with
+        a straight trend plus a step for the years after the gap and
+        tests the step. A significant step (p < 0.01) together with a
+        significant raw trend (p < 0.05) gives Grade D.
 
-        Counterpoint performs a step-change test around the mission gap
-        to identify trends that may be affected by measurement
-        discontinuities.
-
-        Potentially affected results are classified as Grade D.
+        **What this can and cannot tell you:** the test finds a jump
+        that coincides with the gap. It cannot tell an instrument offset
+        from a real change that is accelerating or happens to straddle
+        the gap. Treat D as "check this one", and compare with a smooth
+        curve (see `tools/diagnose_box.py`) before calling it an artifact.
         """
     )
 
@@ -361,11 +372,57 @@ with st.expander("Seasonal Adjustment and Annual Aggregation"):
     )
 
 # ---------------------------------------------------------------------
-# 5. Limitations
+# 5. Mirror cases and driver check
 # ---------------------------------------------------------------------
 
 st.divider()
-st.header("5. Limitations & Interpretation")
+st.header("5. Mirror Cases and Driver Check")
+
+st.markdown(
+    """
+    Grade A and B units with the same trend direction that lie within
+    500 km of each other are merged into regions. Each region's average
+    series is tested and graded again as one series. A **mirror pair** is
+    a rising A/B region and a falling A/B region within 6,000 km of each
+    other. Pairs are ranked by the smaller of the two ratios
+    |slope| / standard error, so a pair is only as strong as its weaker side.
+
+    For the top pairs, the driver check compares each region with the
+    annual NASA POWER (MERRA-2) precipitation trend at the region's
+    centre point. A side is labelled *follows* or *opposes* the
+    precipitation trend, or *unreliable* when the precipitation trend is
+    not significant (p of 0.10 or more). One point can misrepresent a
+    large region, and this is association only, never proof of cause.
+    """
+)
+
+# ---------------------------------------------------------------------
+# 6. Benchmark
+# ---------------------------------------------------------------------
+
+st.divider()
+st.header("6. Benchmark")
+
+st.markdown(
+    """
+    The benchmark scores the GRACE analysis against a fixed list of
+    regions with an expected direction (`data/benchmark_regions.json`).
+    A region counts as **recovered** only if the observed sign matches
+    AND the grade is A or B, with false-discovery control across the
+    benchmark regions. A region expected to show no trend is recovered
+    only if it is graded C. Misses and contradictions are shown. The
+    file's SHA-256 is stored with each run, and the dashboard says whether
+    the list was frozen before the run; if it was not, treat the scorecard
+    as exploratory.
+    """
+)
+
+# ---------------------------------------------------------------------
+# 7. Limitations
+# ---------------------------------------------------------------------
+
+st.divider()
+st.header("7. Limitations & Interpretation")
 
 st.markdown(
     """
@@ -376,14 +433,23 @@ st.markdown(
     """
 )
 
+_src = ""
+try:
+    _src = json.loads((PROJECT_DIR / "output" / "sources.json").read_text(encoding="utf-8")).get("source", "")
+except (OSError, ValueError):
+    pass
+
 with st.expander("Spatial Resolution"):
     st.markdown(
         """
-        GRACE measurements represent relatively large geographic areas.
-        Counterpoint uses approximately 3-degree geographic blocks,
-        meaning localized changes may not be visible.
+        The JPL GRACE/GRACE-FO product is built from 4,551 equal-area
+        3-degree mascons, published on a 0.5-degree grid, so neighbouring
+        grid cells are not independent and localized changes are not
+        visible. Signal near coastlines can still leak between land and ocean.
         """
     )
+    if _src:
+        st.caption(f"Grouping used in this run: {_src}")
 
 with st.expander("Groundwater Interpretation"):
     st.markdown(
@@ -450,15 +516,15 @@ with nav1:
     if st.button(
         "← Back to Main Dashboard",
         key="back_home",
-        use_container_width=True
+        width="stretch"
     ):
-        st.switch_page("Home.py")
+        st.switch_page("home.py")
 
 with nav2:
     if st.button(
         "🌎 Meet the Team & View Credits",
         key="credits_button",
-        use_container_width=True
+        width="stretch"
     ):
         st.switch_page("pages/credits.py")
 

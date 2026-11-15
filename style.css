@@ -17,6 +17,10 @@
     --radius: 12px;
 }
 
+[data-testid="stHeader"] {
+    display: none;
+}
+
 /* Global application background */
 [data-testid="stAppViewContainer"] {
     background: linear-gradient(

@@ -292,9 +292,8 @@ if clicked is not None:
         st.caption("Click an empty part of the map (or double-click) to close.")
         st.markdown(f"**Location**  \nLatitude {r.lat:.2f}, longitude {r.lon:.2f} (unit {clicked})" + (
             f"  \nWithin: {', '.join(places)}" if places else ""))
-        pct_ = f"; about {r.slope * 10 / abs(r['mean']) * 100:.1f}% of its average level per decade" if C[
-                                                                                                            "pct"] and abs(
-            r["mean"]) > 1e-9 else ""
+        mu_ = float(series[str(clicked)].mean())  # results.csv has no "mean" column
+        pct_ = f"; about {r.slope * 10 / abs(mu_) * 100:.1f}% of its average level per decade" if C["pct"] and abs(mu_) > 1e-9 else ""
         st.markdown(
             f"**Trend**  \n{'Rising' if r.slope > 0 else 'Falling'} {abs(r.slope):.3g} {C['unit']} (95% interval {r.lo:.3g} to {r.hi:.3g}){pct_}.")
         st.markdown(
