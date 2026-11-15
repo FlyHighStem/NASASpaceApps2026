@@ -70,11 +70,9 @@ def _run(s):
         lg.write(f"\n=== {s['title']}  [{datetime.datetime.now():%H:%M:%S}] ===\n$ {shown}\n"); lg.flush()
         return subprocess.Popen(cmd, cwd=ROOT, stdout=lg, stderr=subprocess.STDOUT, env={**os.environ, "PYTHONUNBUFFERED": "1"}).wait()
 
-
 def _worker():
     global _ran
-    load_env();
-    stop = False
+    load_env(); stop = False
     for s in STEPS:
         i = s["id"]
         if s["done"](): _set(i, "done", "already complete"); continue
@@ -87,7 +85,7 @@ def _worker():
         except Exception as e:
             rc = f"error: {e}"
 
-        # Updated handling: non-core steps fail gracefully as a warning
+        # Clean non-core warning handling
         if rc == 0 and s["done"]():
             _set(i, "done", "finished")
         else:
