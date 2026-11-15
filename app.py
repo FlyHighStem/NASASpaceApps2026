@@ -1,10 +1,14 @@
 # streamlit run app.py
 import json, os, numpy as np, pandas as pd, streamlit as st, plotly.express as px, plotly.graph_objects as go
 import counterpoint as cp, features as ft
+import pipeline
+os.chdir(pipeline.ROOT)                                   # run from the project folder no matter where streamlit was launched
 O = "output"; V = f"{O}/vars"; CAT = ft.CATALOG
 st.set_page_config(layout="wide", page_title="Counterpoint")
+pipeline.start()                                           # background setup: download, analyse, fetch features (skips finished steps)
+if not pipeline.core_ready(): pipeline.render(st); st.stop()
 avail = [k for k in CAT if os.path.exists(f"{V}/{k}/results.csv")]
-if not avail: st.error("No features yet. Run: python features.py register-grace  and  python features.py power --stride 2"); st.stop()
+if not avail: st.error("GRACE finished but no features were found. Check output/pipeline.log."); st.stop()
 
 @st.cache_data
 def load(k):
@@ -13,23 +17,27 @@ def load(k):
 def nearest(k, lat, lon, maxkm=700):
     d = load(k)[0]; D = cp.hav(lat, lon, d.lat.values, d.lon.values); i = D.argmin()
     return (d.iloc[i], float(D[i])) if D[i] <= maxkm else (None, None)
+PRESETS = {"World": None, "Africa": ([-38, 40], [-20, 55]), "Asia": ([-12, 60], [25, 150]), "Europe": ([34, 72], [-25, 45]), "North America": ([5, 75], [-170, -50]),
+           "South America": ([-57, 15], [-85, -30]), "Oceania": ([-48, 0], [110, 180]), "Western USA": ([30, 52], [-125, -100]), "Mediterranean": ([30, 46], [-10, 40])}
 arrow = lambda s: "↑ rising" if s > 0 else "↓ falling"
 
 # ---- Sidebar filters
 st.sidebar.header("Filters")
+pipeline.sidebar_status(st, set(avail), set(CAT))
 theme = st.sidebar.radio("Theme", ["Water", "Wildfire conditions"])
 opts = [k for k in avail if CAT[k]["group"] == theme]
 if not opts: st.warning(f"No {theme} features loaded yet (see README)."); st.stop()
 feat = st.sidebar.selectbox("Feature", opts, format_func=lambda k: CAT[k]["label"]); C = CAT[feat]
 grades = st.sidebar.multiselect("Evidence grade", list("ABCD"), ["A", "B"])
 direction = st.sidebar.radio("Direction", ["Both", "Rising", "Falling"], horizontal=True)
-scope = st.sidebar.selectbox("Region", ["world", "africa", "asia", "europe", "north america", "south america"])
+region = st.sidebar.selectbox("Region", list(PRESETS)); box = PRESETS[region]
 hide_ice = st.sidebar.checkbox("Hide Antarctica and Greenland", True)
 pct = st.sidebar.slider("Colour range = percentile of trend size", 80, 100, 95)
 df, series, R, P, meta = load(feat)
 d = df[df.grade.isin(grades)]
 if direction != "Both": d = d[d.sign > 0] if direction == "Rising" else d[d.sign < 0]
 if hide_ice: d = d[~((d.lat < -60) | ((d.lat > 60) & (d.lon > -75) & (d.lon < -10)))]
+if box: d = d[(d.lat >= box[0][0]) & (d.lat <= box[0][1]) & (d.lon >= box[1][0]) & (d.lon <= box[1][1])]
 
 # ---- Header
 st.title("Counterpoint: Earth System Trend Detective")
@@ -43,10 +51,10 @@ m = max(float(np.percentile(d.slope.abs(), pct)), 1e-9)
 fig = px.scatter_geo(d, lat="lat", lon="lon", color="slope", symbol="grade", custom_data=["id"], color_continuous_scale=C["cmap"], range_color=[-m, m],
                      hover_data={"id": True, "grade": True, "slope": ":.3g", "q": ":.3f", "robust": ":.0%", "lat": ":.1f", "lon": ":.1f"})
 fig.update_traces(marker=dict(size=9, line=dict(width=0.4, color="#444")))
-fig.update_geos(scope=scope, showland=True, landcolor="#f3efe6", showocean=True, oceancolor="#e6eef4", showcountries=True, countrycolor="#b9b9b9", coastlinecolor="#777",
-                **({"projection_type": "natural earth"} if scope == "world" else {}))
-fig.update_layout(height=560, margin=dict(l=0, r=0, t=0, b=0), coloraxis_colorbar=dict(title=C["unit"]))
-ev = st.plotly_chart(fig, use_container_width=True, on_select="rerun", selection_mode="points", key="map")
+fig.update_geos(showland=True, landcolor="#f3efe6", showocean=True, oceancolor="#e6eef4", showcountries=True, countrycolor="#b9b9b9", coastlinecolor="#777", showframe=False,
+                **({"projection_type": "natural earth"} if box is None else {"projection_type": "equirectangular", "lataxis_range": box[0], "lonaxis_range": box[1]}))
+fig.update_layout(height=560, margin=dict(l=0, r=0, t=0, b=0), coloraxis_colorbar=dict(title=C["unit"]), uirevision=region)
+ev = st.plotly_chart(fig, width="stretch", on_select="rerun", selection_mode="points", key=f"map-{region}")
 uid = None
 try: uid = int(ev["selection"]["points"][0]["customdata"][0])
 except Exception: pass
@@ -65,7 +73,7 @@ a, b = st.columns([2, 1]); s = series[str(uid)]; x, y = cp.annual(s); sd = s.dro
 f2 = go.Figure(); f2.add_trace(go.Scatter(x=sd.index.year+(sd.index.month-1)/12, y=sd.values, mode="lines", name="monthly (deseasonalised)", line=dict(color="#c7c7c7", width=1)))
 f2.add_trace(go.Scatter(x=x, y=y, mode="markers+lines", name="annual mean")); f2.add_trace(go.Scatter(x=x, y=np.median(y-r.slope*x)+r.slope*x, name="Theil-Sen trend", line=dict(width=3)))
 if feat == "grace_lwe" and "gap" in meta and x.min() < meta["gap"][0] and x.max() > meta["gap"][1]: f2.add_vrect(x0=meta["gap"][0], x1=meta["gap"][1], fillcolor="grey", opacity=0.3, annotation_text="mission gap")
-f2.update_layout(height=340, xaxis_title="year", yaxis_title=C["unit"].split(" per")[0].split("/")[0]); a.plotly_chart(f2, use_container_width=True)
+f2.update_layout(height=340, xaxis_title="year", yaxis_title=C["unit"].split(" per")[0].split("/")[0]); a.plotly_chart(f2, width="stretch")
 b.table(pd.DataFrame({"value": [f"{r.slope:.4g}", f"{r.lo:.4g} to {r.hi:.4g}", f"{r.p:.4g}", f"{r.q:.4f}", f"{r.robust:.0%}", f"{int(r.n_years)}", f"{r.step_p:.3g}" if pd.notna(r.step_p) else "n/a"]},
     index=["Trend slope", "95% interval", "Mann-Kendall p", "FDR q", "Windows agreeing", "Years used", "Gap-step p"]))
 n = len(x); H = np.full((n, n), np.nan)
@@ -73,7 +81,7 @@ for i in range(n):
     for j in range(i+cp.MINWIN-1, n): H[i, j] = cp.sen(x[i:j+1], y[i:j+1])[0]
 hm = max(np.nanpercentile(np.abs(H), 95), 1e-9)
 st.plotly_chart(px.imshow(H, x=x, y=x, color_continuous_scale=C["cmap"], zmin=-hm, zmax=hm, labels=dict(x="end year", y="start year", color="trend"),
-    title="Does the trend depend on the years chosen? (slope for every start/end year, >=10 years)").update_layout(height=380), use_container_width=True)
+    title="Does the trend depend on the years chosen? (slope for every start/end year, >=10 years)").update_layout(height=380), width="stretch")
 
 st.subheader("All features at this location")
 rows = []
@@ -100,7 +108,7 @@ else:
         st.write(f"**{CAT[feat]['label']} moves {arrow(region.slope)} here and {arrow(o.slope)} {km:.0f} km away** (partner grade {o.grade}, slope {o.slope:.3g}).")
         mp = px.scatter_geo(pd.DataFrame({"lat": [region.lat, o.lat], "lon": [region.lon, o.lon], "side": ["selected", "mirror partner"]}), lat="lat", lon="lon", color="side")
         mp.update_traces(marker=dict(size=12)); mp.update_geos(fitbounds="locations", showland=True, landcolor="#f3efe6", showcountries=True); mp.update_layout(height=300, margin=dict(l=0, r=0, t=0, b=0))
-        st.plotly_chart(mp, use_container_width=True)
+        st.plotly_chart(mp, width="stretch")
         rows = []
         for k in avail:
             if k == feat: continue

@@ -33,7 +33,7 @@ def annual(series):
     s = s.dropna()
     s = s - s.groupby(s.index.month).transform("mean")
     g = s.groupby(s.index.year)
-    a = g.mean()[g.count() >= 9]
+    c = g.count(); a = g.mean()[c >= min(9, c.max())]   # adaptive: peak-season series have only 3 months/year
     return a.index.values.astype(float), a.values
 
 def analyse(series, gap=None):
@@ -57,7 +57,7 @@ def bh(p):
     out = np.empty(m); out[o] = np.minimum(adj, 1); return out
 
 def grade(r):
-    if r["step_p"] < 0.01: return "D", "A step at the instrument gap fits better than a steady trend (possible artifact)."
+    if r["step_p"] < 0.01 and r["p"] < 0.05: return "D", "A step at the instrument gap fits better than a steady trend (possible artifact)."
     if r["q"] >= Q: return "C", f"Not significant after multiple-testing control (q={r['q']:.2f}); indistinguishable from noise."
     if r["robust"] >= 0.8: return "A", f"Significant (q={r['q']:.3f}) and keeps its sign in {r['robust']:.0%} of start/end windows."
     return "B", f"Significant (q={r['q']:.3f}) but only {r['robust']:.0%} of start/end windows agree: fragile."
@@ -65,6 +65,7 @@ def grade(r):
 def _one(item): return analyse(item[1])
 
 def grade_frame(rows):
+    if len(rows) == 0: return pd.DataFrame(columns=["id", "slope", "lo", "hi", "se", "p", "robust", "step_p", "n_years", "q", "grade", "reason", "sign"])
     df = pd.DataFrame(rows); df["q"] = bh(df["p"].values)
     gr = df.apply(lambda r: pd.Series(grade(r), index=["grade", "reason"]), axis=1)
     df = pd.concat([df, gr], axis=1); df["sign"] = np.sign(df["slope"]); return df
@@ -152,7 +153,7 @@ def verdict(a, b):
     side = "wetter-trend" if a == "opposes" else "drying-trend"
     return f"Only one side tracks precipitation; the {side} side moves against it, so rainfall explains the split only partly (association, not cause)."
 
-def load_grace(path, var="lwe_thickness"):
+def load_grace(path, var="lwe_thickness", mascon_var=None):
     import xarray as xr
     ds = xr.open_dataset(path); da = ds[var]
     for d in ("time", "lat", "lon"):
@@ -162,7 +163,8 @@ def load_grace(path, var="lwe_thickness"):
     v = da.values.reshape(da.sizes["time"], -1)
     keep = ds["land_mask"].values.ravel() == 1 if "land_mask" in ds else np.ones(LA.size, bool)
     keep &= ~np.isnan(v).all(axis=0); v, LA, LO = v[:, keep], LA[keep], LO[keep]
-    if "mascon_id" in ds: ids = ds["mascon_id"].values.ravel()[keep]; note = "native_mascon_id"
+    mv = mascon_var or "mascon_id"
+    if mv in ds: ids = ds[mv].values.ravel()[keep]; note = f"native_mascon_id ({mv})"
     else: ids = np.floor(LA/3)*1000+np.floor(LO/3); note = "APPROXIMATE 3-degree blocks (no mascon id layer found)"
     o = np.argsort(ids, kind="stable"); ids, v, LA, LO = ids[o], v[:, o], LA[o], LO[o]
     u, start = np.unique(ids, return_index=True); ok = ~np.isnan(v)
@@ -173,20 +175,29 @@ def load_grace(path, var="lwe_thickness"):
     print(f"land units: {len(u)} | grouping: {note}"); return table, {int(i): (a, b) for i, a, b in zip(u, clat, clon)}, note
 
 def benchmark(table, coords, path, gap):
+    """Score pre-registered regions. 'recovered' needs the expected sign AND evidence grade A or B,
+    with BH multiple-testing control across the benchmark regions (not just a raw p < 0.05)."""
     if not path or not os.path.exists(path): return None, None, None
     raw = open(path, "rb").read(); cfg = json.loads(raw); sha = hashlib.sha256(raw).hexdigest()
-    ids = list(table.columns); la = np.array([coords[k][0] for k in ids]); lo = np.array([coords[k][1] for k in ids]); rows = []
+    ids = list(table.columns); la = np.array([coords[k][0] for k in ids]); lo = np.array([coords[k][1] for k in ids])
+    rows, fits = [], []
     for r in cfg["regions"]:
         m = (la >= r["lat"][0]) & (la <= r["lat"][1]) & (lo >= r["lon"][0]) & (lo <= r["lon"][1])
-        base = dict(name=r["name"], tier=r["tier"], expected=r["expected"], n_mascons=int(m.sum()))
-        a = analyse(table[[ids[i] for i in np.where(m)[0]]].mean(axis=1), gap) if m.any() else None
-        if a is None: rows.append(dict(base, result="no data in box")); continue
-        sign = "up" if a["slope"] > 0 else "down"; sig = a["p"] < 0.05
-        if r["expected"] == "none": res = "recovered (no significant trend)" if not sig else f"contradicted ({sign}, significant)"
-        elif sig and sign == r["expected"]: res = "recovered"
-        elif sig: res = f"contradicted (observed {sign})"
-        else: res = "missed (not significant)"
-        rows.append(dict(base, slope=a["slope"], p=a["p"], observed=sign, result=res))
+        rows.append(dict(name=r["name"], tier=r.get("tier", ""), expected=r["expected"], n_mascons=int(m.sum())))
+        fits.append(analyse(table[[ids[i] for i in np.where(m)[0]]].mean(axis=1), gap) if m.any() else None)
+    have = [i for i, a in enumerate(fits) if a]
+    if have:
+        for i, qi in zip(have, bh([fits[i]["p"] for i in have])): fits[i]["q"] = qi
+    for row, a in zip(rows, fits):
+        if a is None: row["result"] = "no data in box" if row["n_mascons"] == 0 else "too few years"; continue
+        g, _ = grade(a); sign = "up" if a["slope"] > 0 else "down"; exp = row["expected"]
+        row.update(slope=a["slope"], p=a["p"], q=a["q"], robust=a["robust"], grade=g, observed=sign)
+        if exp == "none": res = "recovered (no clear trend)" if g == "C" else "unreliable (gap artifact)" if g == "D" else f"contradicted ({sign}, grade {g})"
+        elif g in ("A", "B") and sign == exp: res = "recovered" + (" (fragile)" if g == "B" else "")
+        elif g in ("A", "B"): res = f"contradicted (observed {sign}, grade {g})"
+        elif g == "D": res = "unreliable (gap artifact)"
+        else: res = "missed (not distinguishable from noise)"
+        row["result"] = res
     return pd.DataFrame(rows), sha, bool(cfg.get("frozen"))
 
 def monthly_check(table, df):
@@ -222,7 +233,7 @@ def run(table, coords, source, out="output", jobs=1, gap=None, driver_var=None, 
     df.to_csv(f"{out}/results.csv", index=False); to_geojson(df, f"{out}/results.geojson"); table.round(3).to_csv(f"{out}/series.csv")
     R.to_csv(f"{out}/regions.csv", index=False); P.to_csv(f"{out}/pairs.csv", index=False)
     if B is not None: B.to_csv(f"{out}/benchmark.csv", index=False)
-    json.dump(dict(source=source, driver=driver_var, fetched=datetime.datetime.utcnow().isoformat()+"Z", n_units=len(df), gap=list(gap),
+    json.dump(dict(source=source, driver=driver_var, fetched=datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), n_units=len(df), gap=list(gap),
                    period=[str(table.index.min().date()), str(table.index.max().date())], benchmark_sha256=sha, benchmark_frozen=frozen,
                    monthly_check=mc), open(f"{out}/sources.json", "w"), indent=2)
     print("REAL DATA:", source); print("grades:", df.grade.value_counts().to_dict(), "| regions:", len(R), "| pairs:", len(P))
@@ -251,7 +262,7 @@ def validate(out="output", sims=300):
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(); sub = ap.add_subparsers(dest="cmd", required=True); cpu = max(1, (os.cpu_count() or 2)-1)
     f = sub.add_parser("fetch"); f.add_argument("--short-name", default="TELLUS_GRAC-GRFO_MASCON_CRI_GRID_RL06.3_V4")
-    r = sub.add_parser("run"); r.add_argument("--grace", required=True); r.add_argument("--var", default="lwe_thickness")
+    r = sub.add_parser("run"); r.add_argument("--grace", required=True); r.add_argument("--var", default="lwe_thickness"); r.add_argument("--mascon-var", default=None)
     r.add_argument("--driver-var", default=None); r.add_argument("--jobs", type=int, default=cpu); r.add_argument("--monthly-check", action="store_true")
     r.add_argument("--benchmark", default="data/benchmark_regions.json"); r.add_argument("--top", type=int, default=10)
     p = sub.add_parser("power"); p.add_argument("--bbox", nargs=4, type=float, default=[-40, 60, -20, 140]); p.add_argument("--step", type=float, default=10)
@@ -261,7 +272,7 @@ if __name__ == "__main__":
     if a.cmd == "fetch":
         import earthaccess; earthaccess.login(strategy="environment"); res = earthaccess.search_data(short_name=a.short_name); print(len(res), "granules"); earthaccess.download(res, "data/")
     elif a.cmd == "run":
-        t, c, note = load_grace(a.grace, a.var)
+        t, c, note = load_grace(a.grace, a.var, a.mascon_var)
         run(t, c, f"JPL GRACE/GRACE-FO mascons RL06.3 CRI, {os.path.basename(a.grace)} (cm LWE; {note})", jobs=a.jobs, driver_var=a.driver_var, monthly=a.monthly_check, bench=a.benchmark, top=a.top)
     elif a.cmd == "power":
         t, c = power_grid(a.bbox, a.step, a.var, a.start, a.end)

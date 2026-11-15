@@ -131,7 +131,7 @@ def add_var(name, table, coords, source, jobs=1, gap=NOGAP):
             dict(
                 source=source,
                 gap=list(gap),
-                fetched=datetime.datetime.utcnow().isoformat() + "Z",
+                fetched=datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
                 period=[
                     str(table.index.min().date()),
                     str(table.index.max().date())

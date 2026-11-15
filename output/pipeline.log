@@ -1,0 +1,550 @@
+
+=== Wildfire detections, intensity and peak season (NASA FIRMS)  [17:52:21] ===
+$ /Users/aanyatiwari/Desktop/counterpoint/.venv/bin/python features.py fires --map-key *** --bbox -125 30 -110 45 --start 2002 --end 2025 --jobs 9
+1754 FIRMS requests (MODIS_SP). If you see errors, check the source name in the FIRMS API docs.
+Traceback (most recent call last):
+  File "/Users/aanyatiwari/Desktop/counterpoint/features.py", line 622, in <module>
+    fires(a.csv, a.map_key, a.bbox, a.start, a.end, a.jobs)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aanyatiwari/Desktop/counterpoint/features.py", line 409, in fires
+    parts = [p for p in ex.map(one, days) if p is not None]
+                        ~~~~~~^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 619, in result_iterator
+    yield _result_or_cancel(fs.pop())
+          ~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 317, in _result_or_cancel
+    return fut.result(timeout)
+           ~~~~~~~~~~^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 456, in result
+    return self.__get_result()
+           ~~~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 401, in __get_result
+    raise self._exception
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/Users/aanyatiwari/Desktop/counterpoint/features.py", line 392, in one
+    raise RuntimeError(
+        f"FIRMS HTTP {response.status_code}: {response.text[:1000]}"
+    )
+RuntimeError: FIRMS HTTP 400: Invalid MAP_KEY.
+
+=== Groundwater-style anomaly (GRACE minus GLDAS; large download)  [17:53:37] ===
+$ /Users/aanyatiwari/Desktop/counterpoint/.venv/bin/python features.py groundwater --fetch --jobs 9
+285 GLDAS granules
+Traceback (most recent call last):
+  File "/Users/aanyatiwari/Desktop/counterpoint/features.py", line 614, in <module>
+    groundwater(a.dir, a.fetch, a.start, a.end, a.jobs)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aanyatiwari/Desktop/counterpoint/features.py", line 468, in groundwater
+    earthaccess.download(res, gdir)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/earthaccess/api.py", line 430, in download
+    return earthaccess.__store__.get(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        granules,
+        ^^^^^^^^^
+    ...<6 lines>...
+        force=force,
+        ^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/earthaccess/store.py", line 705, in get
+    return self._get(
+           ~~~~~~~~~^
+        granules,
+        ^^^^^^^^^
+    ...<4 lines>...
+        force=force,
+        ^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/multimethod/__init__.py", line 372, in __call__
+    return func(*args, **kwargs)
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/earthaccess/store.py", line 870, in _get_granules
+    return self._download_onprem_granules(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        data_links,
+        ^^^^^^^^^^^
+    ...<2 lines>...
+        force=force,
+        ^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/earthaccess/store.py", line 990, in _download_onprem_granules
+    return pqdm(arguments, self._download_file, **pqdm_kwargs)
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/pqdm/threads.py", line 22, in pqdm
+    return _parallel_process(
+        iterable=array,
+    ...<6 lines>...
+        **kwargs
+    )
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/pqdm/_base.py", line 79, in _parallel_process
+    raise e
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/pqdm/_base.py", line 76, in _parallel_process
+    results.append(future.result())
+                   ~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 449, in result
+    return self.__get_result()
+           ~~~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 401, in __get_result
+    raise self._exception
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/tenacity/__init__.py", line 404, in wrapped_f
+    return copy(f, *args, **kw)
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/tenacity/__init__.py", line 550, in __call__
+    do = self.iter(retry_state=retry_state)
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/tenacity/__init__.py", line 440, in iter
+    result = action(retry_state)
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/tenacity/__init__.py", line 482, in exc_check
+    retry_exc.reraise()
+    ~~~~~~~~~~~~~~~~~^^
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/tenacity/__init__.py", line 216, in reraise
+    raise self.last_attempt.result()
+          ~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 449, in result
+    return self.__get_result()
+           ~~~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 401, in __get_result
+    raise self._exception
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/tenacity/__init__.py", line 553, in __call__
+    result = fn(*args, **kwargs)
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/earthaccess/store.py", line 932, in _download_file
+    raise EulaNotAccepted(msg)
+earthaccess.exceptions.EulaNotAccepted: Eula Acceptance Failure for https://data.gesdisc.earthdata.nasa.gov/data/GLDAS/GLDAS_NOAH025_M.2.1/2002/GLDAS_NOAH025_M.A200204.021.nc4
+
+=== Wildfire detections, intensity and peak season (NASA FIRMS)  [18:03:59] ===
+$ /Users/aanyatiwari/Desktop/counterpoint/.venv/bin/python features.py fires --map-key *** --bbox -125 30 -110 45 --start 2002 --end 2025 --jobs 9
+1754 FIRMS requests (MODIS_SP). If you see errors, check the source name in the FIRMS API docs.
+Traceback (most recent call last):
+  File "/Users/aanyatiwari/Desktop/counterpoint/features.py", line 622, in <module>
+    fires(a.csv, a.map_key, a.bbox, a.start, a.end, a.jobs)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aanyatiwari/Desktop/counterpoint/features.py", line 409, in fires
+    parts = [p for p in ex.map(one, days) if p is not None]
+                        ~~~~~~^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 619, in result_iterator
+    yield _result_or_cancel(fs.pop())
+          ~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 317, in _result_or_cancel
+    return fut.result(timeout)
+           ~~~~~~~~~~^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 456, in result
+    return self.__get_result()
+           ~~~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 401, in __get_result
+    raise self._exception
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/Users/aanyatiwari/Desktop/counterpoint/features.py", line 392, in one
+    raise RuntimeError(
+        f"FIRMS HTTP {response.status_code}: {response.text[:1000]}"
+    )
+RuntimeError: FIRMS HTTP 400: Invalid MAP_KEY.
+
+=== Groundwater-style anomaly (GRACE minus GLDAS; large download)  [18:05:15] ===
+$ /Users/aanyatiwari/Desktop/counterpoint/.venv/bin/python features.py groundwater --fetch --jobs 9
+285 GLDAS granules
+Traceback (most recent call last):
+  File "/Users/aanyatiwari/Desktop/counterpoint/features.py", line 614, in <module>
+    groundwater(a.dir, a.fetch, a.start, a.end, a.jobs)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aanyatiwari/Desktop/counterpoint/features.py", line 468, in groundwater
+    earthaccess.download(res, gdir)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/earthaccess/api.py", line 430, in download
+    return earthaccess.__store__.get(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        granules,
+        ^^^^^^^^^
+    ...<6 lines>...
+        force=force,
+        ^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/earthaccess/store.py", line 705, in get
+    return self._get(
+           ~~~~~~~~~^
+        granules,
+        ^^^^^^^^^
+    ...<4 lines>...
+        force=force,
+        ^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/multimethod/__init__.py", line 372, in __call__
+    return func(*args, **kwargs)
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/earthaccess/store.py", line 870, in _get_granules
+    return self._download_onprem_granules(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        data_links,
+        ^^^^^^^^^^^
+    ...<2 lines>...
+        force=force,
+        ^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/earthaccess/store.py", line 990, in _download_onprem_granules
+    return pqdm(arguments, self._download_file, **pqdm_kwargs)
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/pqdm/threads.py", line 22, in pqdm
+    return _parallel_process(
+        iterable=array,
+    ...<6 lines>...
+        **kwargs
+    )
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/pqdm/_base.py", line 79, in _parallel_process
+    raise e
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/pqdm/_base.py", line 76, in _parallel_process
+    results.append(future.result())
+                   ~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 449, in result
+    return self.__get_result()
+           ~~~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 401, in __get_result
+    raise self._exception
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/tenacity/__init__.py", line 404, in wrapped_f
+    return copy(f, *args, **kw)
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/tenacity/__init__.py", line 550, in __call__
+    do = self.iter(retry_state=retry_state)
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/tenacity/__init__.py", line 440, in iter
+    result = action(retry_state)
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/tenacity/__init__.py", line 482, in exc_check
+    retry_exc.reraise()
+    ~~~~~~~~~~~~~~~~~^^
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/tenacity/__init__.py", line 216, in reraise
+    raise self.last_attempt.result()
+          ~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 449, in result
+    return self.__get_result()
+           ~~~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 401, in __get_result
+    raise self._exception
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/tenacity/__init__.py", line 553, in __call__
+    result = fn(*args, **kwargs)
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/earthaccess/store.py", line 932, in _download_file
+    raise EulaNotAccepted(msg)
+earthaccess.exceptions.EulaNotAccepted: Eula Acceptance Failure for https://data.gesdisc.earthdata.nasa.gov/data/GLDAS/GLDAS_NOAH025_M.2.1/2002/GLDAS_NOAH025_M.A200204.021.nc4
+
+=== Wildfire detections, intensity and peak season (NASA FIRMS)  [18:48:33] ===
+$ /Users/aanyatiwari/Desktop/counterpoint/.venv/bin/python features.py fires --map-key *** --bbox -125 30 -110 45 --start 2002 --end 2025 --jobs 9
+1754 FIRMS requests (MODIS_SP). If you see errors, check the source name in the FIRMS API docs.
+Traceback (most recent call last):
+  File "/Users/aanyatiwari/Desktop/counterpoint/features.py", line 622, in <module>
+    fires(a.csv, a.map_key, a.bbox, a.start, a.end, a.jobs)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aanyatiwari/Desktop/counterpoint/features.py", line 409, in fires
+    parts = [p for p in ex.map(one, days) if p is not None]
+                        ~~~~~~^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 619, in result_iterator
+    yield _result_or_cancel(fs.pop())
+          ~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 317, in _result_or_cancel
+    return fut.result(timeout)
+           ~~~~~~~~~~^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 456, in result
+    return self.__get_result()
+           ~~~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 401, in __get_result
+    raise self._exception
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/Users/aanyatiwari/Desktop/counterpoint/features.py", line 392, in one
+    raise RuntimeError(
+        f"FIRMS HTTP {response.status_code}: {response.text[:1000]}"
+    )
+RuntimeError: FIRMS HTTP 400: Invalid MAP_KEY.
+
+=== Groundwater-style anomaly (GRACE minus GLDAS; large download)  [18:49:55] ===
+$ /Users/aanyatiwari/Desktop/counterpoint/.venv/bin/python features.py groundwater --fetch --jobs 9
+285 GLDAS granules
+Traceback (most recent call last):
+  File "/Users/aanyatiwari/Desktop/counterpoint/features.py", line 614, in <module>
+    groundwater(a.dir, a.fetch, a.start, a.end, a.jobs)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aanyatiwari/Desktop/counterpoint/features.py", line 468, in groundwater
+    earthaccess.download(res, gdir)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/earthaccess/api.py", line 430, in download
+    return earthaccess.__store__.get(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        granules,
+        ^^^^^^^^^
+    ...<6 lines>...
+        force=force,
+        ^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/earthaccess/store.py", line 705, in get
+    return self._get(
+           ~~~~~~~~~^
+        granules,
+        ^^^^^^^^^
+    ...<4 lines>...
+        force=force,
+        ^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/multimethod/__init__.py", line 372, in __call__
+    return func(*args, **kwargs)
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/earthaccess/store.py", line 870, in _get_granules
+    return self._download_onprem_granules(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        data_links,
+        ^^^^^^^^^^^
+    ...<2 lines>...
+        force=force,
+        ^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/earthaccess/store.py", line 990, in _download_onprem_granules
+    return pqdm(arguments, self._download_file, **pqdm_kwargs)
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/pqdm/threads.py", line 22, in pqdm
+    return _parallel_process(
+        iterable=array,
+    ...<6 lines>...
+        **kwargs
+    )
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/pqdm/_base.py", line 79, in _parallel_process
+    raise e
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/pqdm/_base.py", line 76, in _parallel_process
+    results.append(future.result())
+                   ~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 449, in result
+    return self.__get_result()
+           ~~~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 401, in __get_result
+    raise self._exception
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/tenacity/__init__.py", line 404, in wrapped_f
+    return copy(f, *args, **kw)
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/tenacity/__init__.py", line 550, in __call__
+    do = self.iter(retry_state=retry_state)
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/tenacity/__init__.py", line 440, in iter
+    result = action(retry_state)
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/tenacity/__init__.py", line 482, in exc_check
+    retry_exc.reraise()
+    ~~~~~~~~~~~~~~~~~^^
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/tenacity/__init__.py", line 216, in reraise
+    raise self.last_attempt.result()
+          ~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 449, in result
+    return self.__get_result()
+           ~~~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 401, in __get_result
+    raise self._exception
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/tenacity/__init__.py", line 553, in __call__
+    result = fn(*args, **kwargs)
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/earthaccess/store.py", line 932, in _download_file
+    raise EulaNotAccepted(msg)
+earthaccess.exceptions.EulaNotAccepted: Eula Acceptance Failure for https://data.gesdisc.earthdata.nasa.gov/data/GLDAS/GLDAS_NOAH025_M.2.1/2002/GLDAS_NOAH025_M.A200204.021.nc4
+
+=== Wildfire detections, intensity and peak season (NASA FIRMS)  [19:20:08] ===
+$ /Users/aanyatiwari/Desktop/counterpoint/.venv/bin/python features.py fires --map-key *** --bbox -125 30 -110 45 --start 2002 --end 2025 --jobs 9
+1754 FIRMS requests (MODIS_SP). If you see errors, check the source name in the FIRMS API docs.
+Traceback (most recent call last):
+  File "/Users/aanyatiwari/Desktop/counterpoint/features.py", line 622, in <module>
+    fires(a.csv, a.map_key, a.bbox, a.start, a.end, a.jobs)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aanyatiwari/Desktop/counterpoint/features.py", line 409, in fires
+    parts = [p for p in ex.map(one, days) if p is not None]
+                        ~~~~~~^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 619, in result_iterator
+    yield _result_or_cancel(fs.pop())
+          ~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 317, in _result_or_cancel
+    return fut.result(timeout)
+           ~~~~~~~~~~^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 456, in result
+    return self.__get_result()
+           ~~~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 401, in __get_result
+    raise self._exception
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/Users/aanyatiwari/Desktop/counterpoint/features.py", line 392, in one
+    raise RuntimeError(
+        f"FIRMS HTTP {response.status_code}: {response.text[:1000]}"
+    )
+RuntimeError: FIRMS HTTP 400: Invalid MAP_KEY.
+
+=== Groundwater-style anomaly (GRACE minus GLDAS; large download)  [19:21:38] ===
+$ /Users/aanyatiwari/Desktop/counterpoint/.venv/bin/python features.py groundwater --fetch --jobs 9
+285 GLDAS granules
+
+=== Wildfire detections, intensity and peak season (NASA FIRMS)  [19:24:00] ===
+$ /Users/aanyatiwari/Desktop/counterpoint/.venv/bin/python3.13 features.py fires --map-key *** --bbox -125 30 -110 45 --start 2002 --end 2025 --jobs 9
+1754 FIRMS requests (MODIS_SP). If you see errors, check the source name in the FIRMS API docs.
+Traceback (most recent call last):
+  File "/Users/aanyatiwari/Desktop/counterpoint/features.py", line 614, in <module>
+    groundwater(a.dir, a.fetch, a.start, a.end, a.jobs)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aanyatiwari/Desktop/counterpoint/features.py", line 468, in groundwater
+    earthaccess.download(res, gdir)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/earthaccess/api.py", line 430, in download
+    return earthaccess.__store__.get(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        granules,
+        ^^^^^^^^^
+    ...<6 lines>...
+        force=force,
+        ^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/earthaccess/store.py", line 705, in get
+    return self._get(
+           ~~~~~~~~~^
+        granules,
+        ^^^^^^^^^
+    ...<4 lines>...
+        force=force,
+        ^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/multimethod/__init__.py", line 372, in __call__
+    return func(*args, **kwargs)
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/earthaccess/store.py", line 870, in _get_granules
+    return self._download_onprem_granules(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        data_links,
+        ^^^^^^^^^^^
+    ...<2 lines>...
+        force=force,
+        ^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/earthaccess/store.py", line 990, in _download_onprem_granules
+    return pqdm(arguments, self._download_file, **pqdm_kwargs)
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/pqdm/threads.py", line 22, in pqdm
+    return _parallel_process(
+        iterable=array,
+    ...<6 lines>...
+        **kwargs
+    )
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/pqdm/_base.py", line 65, in _parallel_process
+    for _ in tqdm_class(as_completed(futures), **processing_opts):
+             ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/tqdm/std.py", line 1175, in __iter__
+    yield from iterable
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 243, in as_completed
+    waiter.event.wait(wait_timeout)
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/threading.py", line 659, in wait
+    signaled = self._cond.wait(timeout)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/threading.py", line 359, in wait
+    waiter.acquire()
+    ~~~~~~~~~~~~~~^^
+KeyboardInterrupt
+Traceback (most recent call last):
+  File "/Users/aanyatiwari/Desktop/counterpoint/features.py", line 622, in <module>
+    fires(a.csv, a.map_key, a.bbox, a.start, a.end, a.jobs)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aanyatiwari/Desktop/counterpoint/features.py", line 409, in fires
+    parts = [p for p in ex.map(one, days) if p is not None]
+                        ~~~~~~^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 619, in result_iterator
+    yield _result_or_cancel(fs.pop())
+          ~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 317, in _result_or_cancel
+    return fut.result(timeout)
+           ~~~~~~~~~~^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 456, in result
+    return self.__get_result()
+           ~~~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 401, in __get_result
+    raise self._exception
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/Users/aanyatiwari/Desktop/counterpoint/features.py", line 392, in one
+    raise RuntimeError(
+        f"FIRMS HTTP {response.status_code}: {response.text[:1000]}"
+    )
+RuntimeError: FIRMS HTTP 400: Invalid MAP_KEY.
+
+=== Groundwater-style anomaly (GRACE minus GLDAS; large download)  [19:25:23] ===
+$ /Users/aanyatiwari/Desktop/counterpoint/.venv/bin/python3.13 features.py groundwater --fetch --jobs 9
+285 GLDAS granules
+Traceback (most recent call last):
+  File "/Users/aanyatiwari/Desktop/counterpoint/features.py", line 614, in <module>
+    groundwater(a.dir, a.fetch, a.start, a.end, a.jobs)
+    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aanyatiwari/Desktop/counterpoint/features.py", line 468, in groundwater
+    earthaccess.download(res, gdir)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/earthaccess/api.py", line 430, in download
+    return earthaccess.__store__.get(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~^
+        granules,
+        ^^^^^^^^^
+    ...<6 lines>...
+        force=force,
+        ^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/earthaccess/store.py", line 705, in get
+    return self._get(
+           ~~~~~~~~~^
+        granules,
+        ^^^^^^^^^
+    ...<4 lines>...
+        force=force,
+        ^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/multimethod/__init__.py", line 372, in __call__
+    return func(*args, **kwargs)
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/earthaccess/store.py", line 870, in _get_granules
+    return self._download_onprem_granules(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        data_links,
+        ^^^^^^^^^^^
+    ...<2 lines>...
+        force=force,
+        ^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/earthaccess/store.py", line 990, in _download_onprem_granules
+    return pqdm(arguments, self._download_file, **pqdm_kwargs)
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/pqdm/threads.py", line 22, in pqdm
+    return _parallel_process(
+        iterable=array,
+    ...<6 lines>...
+        **kwargs
+    )
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/pqdm/_base.py", line 79, in _parallel_process
+    raise e
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/pqdm/_base.py", line 76, in _parallel_process
+    results.append(future.result())
+                   ~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 449, in result
+    return self.__get_result()
+           ~~~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 401, in __get_result
+    raise self._exception
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/tenacity/__init__.py", line 404, in wrapped_f
+    return copy(f, *args, **kw)
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/tenacity/__init__.py", line 550, in __call__
+    do = self.iter(retry_state=retry_state)
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/tenacity/__init__.py", line 440, in iter
+    result = action(retry_state)
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/tenacity/__init__.py", line 482, in exc_check
+    retry_exc.reraise()
+    ~~~~~~~~~~~~~~~~~^^
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/tenacity/__init__.py", line 216, in reraise
+    raise self.last_attempt.result()
+          ~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 449, in result
+    return self.__get_result()
+           ~~~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 401, in __get_result
+    raise self._exception
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/tenacity/__init__.py", line 553, in __call__
+    result = fn(*args, **kwargs)
+  File "/Users/aanyatiwari/Desktop/counterpoint/.venv/lib/python3.13/site-packages/earthaccess/store.py", line 932, in _download_file
+    raise EulaNotAccepted(msg)
+earthaccess.exceptions.EulaNotAccepted: Eula Acceptance Failure for https://data.gesdisc.earthdata.nasa.gov/data/GLDAS/GLDAS_NOAH025_M.2.1/2002/GLDAS_NOAH025_M.A200204.021.nc4

@@ -1,7 +1,7 @@
 {
   "source": "JPL GRACE/GRACE-FO mascons RL06.3 CRI, GRCTellus.JPL.200204_202609.GLO.RL06.3M.MSCNv04CRI.nc (cm LWE; APPROXIMATE 3-degree blocks (no mascon id layer found))",
   "driver": "PRECTOTCORR",
-  "fetched": "2026-11-14T20:12:50.865372Z",
+  "fetched": "2026-11-15T00:22:47Z",
   "n_units": 2978,
   "gap": [
     2017.5,
@@ -11,7 +11,7 @@
     "2002-04-17",
     "2026-09-16"
   ],
-  "benchmark_sha256": "b2531ad1abd5ddbc1a9f2a02d666ef088b8c8c629debe47ed47e9b2e2be3ca93",
-  "benchmark_frozen": true,
+  "benchmark_sha256": "0a8fba6e36973d280560f299e8e4d7507ad7897a584ad36800644e6a2ef1e679",
+  "benchmark_frozen": false,
   "monthly_check": null
 }
