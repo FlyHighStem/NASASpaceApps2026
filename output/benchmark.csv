@@ -1,7 +1,9 @@
 name,tier,expected,n_mascons,slope,p,q,robust,grade,observed,result
-"Northwest India (Punjab, Haryana, Rajasthan)",resolvable,down,9,-1.6141581637999505,9.27444453679982e-07,1.854888907359964e-06,1.0,D,down,unreliable (gap artifact)
-"Maranhao, Brazil",marginal,up,7,0.3863720224575258,0.21471330142519163,0.21471330142519163,0.5384615384615384,C,up,missed (not distinguishable from noise)
-California Central Valley (control: decline),marginal,down,6,-1.056243844966443,0.00030698294704145646,0.0004604744205621847,0.9340659340659341,A,down,recovered
-Iran / Middle East (control: decline),resolvable,down,20,-1.4161559437155762,3.188917130358959e-09,1.9133502782153755e-08,1.0,A,down,recovered
-North China Plain (control: decline),resolvable,down,4,-0.8248555828857588,0.0013064279032353188,0.0015677134838823826,0.8901098901098901,A,down,recovered
-Central Sahara (negative control),resolvable,none,20,-0.16209303071660147,1.5643926865038793e-07,4.693178059511638e-07,1.0,A,down,"contradicted (down, grade A)"
+"Northern India (Punjab, Haryana, northern Rajasthan)",resolvable,down,4,-2.4212874284506682,1.2343413819948523e-06,4.937365527979409e-06,0.989010989010989,A,down,recovered
+"Maranhao, Brazil",marginal,up,6,0.7657170829328013,0.02784675596413333,0.03182486395900952,0.6703296703296703,B,up,recovered (fragile)
+Okavango / southern Africa (wetting),marginal,up,9,-0.16476688327804215,0.6930118863702326,0.6930118863702326,0.6703296703296703,C,down,missed (not distinguishable from noise)
+Nile headwaters (wetting),marginal,up,16,1.445068938348956,6.43195770910765e-06,1.28639154182153e-05,1.0,A,up,recovered
+Tropical western Africa (wetting),marginal,up,15,0.7329028373467992,6.43195770910765e-06,1.28639154182153e-05,1.0,A,up,recovered
+California Central Valley (control: decline),marginal,down,3,-1.2287920821690972,0.00030698294704145646,0.00040931059605527526,0.945054945054945,A,down,recovered
+Northern Middle East / Iran (control: decline),resolvable,down,13,-1.0846585061382172,1.7045954425753962e-08,1.363676354060317e-07,1.0,D,down,unreliable (gap artifact)
+North China Plain (control: decline),resolvable,down,4,-1.3273018737888098,0.0002466331931927357,0.0003946131091083771,0.9340659340659341,A,down,recovered

@@ -666,3 +666,7 @@ Traceback (most recent call last):
   File "/Users/aanyatiwari/Desktop/counterpoint/features.py", line 423, in one
     raise RuntimeError(f"FIRMS HTTP {response.status_code}: {response.text[:300]}")
 RuntimeError: FIRMS HTTP 400: Invalid day range. Expects [1..5].
+
+=== Make GRACE visible to the dashboard  [19:10:01] ===
+$ /Users/aanyatiwari/Desktop/counterpoint/.venv/bin/python3.13 features.py register-grace
+registered grace_lwe
