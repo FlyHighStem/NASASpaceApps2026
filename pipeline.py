@@ -1,5 +1,5 @@
 """One-command setup for Counterpoint: runs every preliminary step in order, skipping what is already done.
-app.py starts it in a background thread on launch; you can also run `python pipeline.py` to do it in the terminal.
+home.py starts it in a background thread on launch; you can also run `python pipeline.py` to do it in the terminal.
 Real NASA data only. Needs an Earthdata login (env vars, ~/.netrc, or .env) for GRACE; everything else is optional."""
 import datetime, glob, netrc, os, subprocess, sys, threading, time, json
 

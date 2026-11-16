@@ -4,9 +4,10 @@ scipy
 xarray
 netcdf4
 requests
-streamlit>=1.50
+streamlit>=1.51
 plotly
 earthaccess
 pymannkendall
 matplotlib
 pytest
+geopy

@@ -35,7 +35,7 @@ def explain(what, why):
 st.title("🔁 Independent cross-check")
 st.markdown(
     "Our trends could be an artefact of one data source or one method. Here you export a monthly time series "
-    "for one point from NASA's own time-series tools and upload it. The **same trend engine, unchanged,** is run on "
+    "for one point from NASA and KNMI time-series tools and upload it. The **same trend engine, unchanged,** is run on "
     "your file and compared with our result at that location."
 )
 
@@ -141,7 +141,7 @@ if up and st.button("Compare"):
         st.error(f"Could not use this file: {e}")
 
 st.header("For your References field")
-st.code("NASA Giovanni, https://giovanni.gsfc.nasa.gov/ (list only if you used it)\n"
-        "NASA GES DISC Hydrology Time Series, https://disc.gsfc.nasa.gov/information/tools?title=Hydrology%20Time%20Series (list only if you used it)\n"
-        "KNMI Climate Explorer, https://climexp.knmi.nl/ (list only if you used it)\n"
+st.code("NASA Giovanni, https://giovanni.gsfc.nasa.gov/\n"
+        "NASA GES DISC Hydrology Time Series, https://disc.gsfc.nasa.gov/information/tools?title=Hydrology%20Time%20Series\n"
+        "KNMI Climate Explorer, https://climexp.knmi.nl/\n"
         "Used for independent cross-checks of our trends: a monthly series exported from the tool was re-tested with the same method and compared with ours.")

@@ -2,6 +2,8 @@
 import json, os, numpy as np, pandas as pd, streamlit as st, plotly.express as px, plotly.graph_objects as go
 import counterpoint as cp, features as ft
 import pipeline
+from geopy.geocoders import Nominatim
+from geopy.extra.rate_limiter import RateLimiter
 
 os.chdir(pipeline.ROOT)  # run from the project folder no matter where streamlit was launched
 O = "output";
@@ -90,6 +92,60 @@ def load(k):
     rd = lambda n: pd.read_csv(f"{V}/{k}/{n}.csv") if os.path.getsize(f"{V}/{k}/{n}.csv") > 5 else pd.DataFrame()
     return rd("results"), pd.read_csv(f"{V}/{k}/series.csv", index_col=0, parse_dates=True), rd("regions"), rd(
         "pairs"), json.load(open(f"{V}/{k}/meta.json"))
+
+
+# ---- Reverse geocoding: only called for a selected map point
+@st.cache_resource
+def _reverse_geocoder():
+    """One shared, rate-limited Nominatim client (the public server allows at most 1 request per second).
+    cache_resource keeps the limiter alive across Streamlit reruns, which re-execute this script."""
+    return RateLimiter(
+        Nominatim(user_agent="counterpoint_earth_system_trend_detective", timeout=15).reverse,
+        min_delay_seconds=1,
+        max_retries=2,
+        error_wait_seconds=2,
+        swallow_exceptions=False
+    )
+
+@st.cache_data(ttl=86400)
+def get_location(lat, lon):
+    try:
+        result = _reverse_geocoder()(
+            (lat, lon),
+            exactly_one=True,
+            language="en",
+            timeout=15
+        )
+
+        if result is None:
+            return None, None, None
+
+        address = result.raw.get("address", {})
+
+        place = (
+            address.get("city")
+            or address.get("town")
+            or address.get("village")
+            or address.get("municipality")
+            or address.get("county")
+            or address.get("road")
+            or result.raw.get("name")
+        )
+
+        region = (
+            address.get("state")
+            or address.get("province")
+            or address.get("region")
+            or address.get("state_district")
+        )
+
+        country = address.get("country")
+
+        return place, region, country
+
+    except Exception as e:
+        st.error(f"Geocoding error: {type(e).__name__}: {e}")
+        return None, None, None
 
 
 def nearest(k, lat, lon, maxkm=700):
@@ -201,6 +257,7 @@ st.markdown(
 
 # ---- Map (click a point to inspect it)
 st.header("Map")
+st.caption("Click a point to open its details and mirror cases below.")
 if d.empty: st.warning("No units match these filters."); st.stop()
 m = max(float(np.percentile(d.slope.abs(), pct)), 1e-9)
 fig = px.scatter_geo(d, lat="lat", lon="lon", color="slope", symbol="grade", category_orders={"grade": list("ABCD")},
@@ -208,7 +265,13 @@ fig = px.scatter_geo(d, lat="lat", lon="lon", color="slope", symbol="grade", cat
                      color_continuous_scale=C["cmap"], range_color=[-m, m],
                      hover_data={"id": True, "grade": True, "slope": ":.3g", "q": ":.3f", "robust": ":.0%",
                                  "lat": ":.1f", "lon": ":.1f"})
-fig.update_traces(marker=dict(size=9, line=dict(width=0.4, color="#444")))
+fig.update_traces(
+    marker=dict(size=9, line=dict(width=0.4, color="#444")),
+    # Selected point: drawn larger and fully opaque; the others fade. (Plotly's built-in selected style cannot thicken
+    # an outline, and adding a ring trace makes Streamlit clear the selection, which would close the details panel.)
+    selected=dict(marker=dict(size=17, opacity=1)),
+    unselected=dict(marker=dict(opacity=0.3)),
+)
 
 fig.update_geos(
     showland=True,
@@ -242,276 +305,638 @@ fig.update_layout(
 
 fig = style_plotly(fig)
 
-ev = st.plotly_chart(fig, width="stretch", on_select="rerun", selection_mode="points", key=f"map-{region}-{rev}")
-uid = None
+# ---- Map selection
+st.session_state.setdefault("point_id", None)
+
+# Highlight the point selected in the dropdown
+selected_id = st.session_state["point_id"]
+
+for trace in fig.data:
+    if trace.customdata is not None:
+        trace_ids = [int(row[0]) for row in trace.customdata]
+
+        trace.selectedpoints = [
+            i for i, point_id in enumerate(trace_ids)
+            if point_id == selected_id
+        ] if selected_id is not None else None
+
+map_key = f"map-{region}-{rev}"
+
+ev = st.plotly_chart(
+    fig,
+    width="stretch",
+    on_select="rerun",
+    selection_mode="points",
+    key=map_key
+)
+
+# Read the current map selection
+map_id = None
+
 try:
-    uid = int(ev["selection"]["points"][0]["customdata"][0])
-except Exception:
+    _points = ev["selection"]["points"]
+
+    if _points:
+        _cd = _points[0]["customdata"]
+        map_id = int(
+            _cd.get("0", next(iter(_cd.values())))
+            if isinstance(_cd, dict) else _cd[0]
+        )
+except (IndexError, KeyError, TypeError, ValueError):
     pass
-clicked = uid if (
-            uid is not None and uid in set(d.id)) else None  # None = nothing selected: the details panel stays closed
-uid = clicked
-st.caption("Click a point to open its details and mirror cases below.")
-_warm = C["cmap"].startswith("BrBG")
-explain(
-    f"Each dot is one 3-degree block of land (the same blocks are used for every feature). The colour is the trend: how fast {C['label'].lower()} is changing per year, in {C['unit']}. "
-    + (
-        "Brown means falling or drying, blue-green means rising or wetting" if _warm else "Red means rising or warming, blue means falling") + ", pale means almost no change, and the scale is centred on zero. "
-                                                                                                                                               "The marker shape is the evidence grade, and hovering shows the grade and the exact numbers. By default only grade A and B trends are drawn, so noise is not plotted.",
-    "This answers the challenge's questions in one view: what is changing, where, how much, and whether it is real. Look for neighbouring areas with opposite colours: those are candidate mirror cases, where the same variable moves up in one place and down in another.")
-c1, c2 = st.columns(2);
-c1.download_button("Download CSV", df.to_csv(index=False), f"{feat}_results.csv")
-if feat == "grace_lwe" and os.path.exists(f"{O}/results.geojson"): c2.download_button("Download GeoJSON", open(
-    f"{O}/results.geojson").read(), "counterpoint_results.geojson")
-if uid is None:
-    ids = d.sort_values("slope", key=abs, ascending=False).id.tolist();
-    uid = st.selectbox("...or pick a location (largest trends first)", ids)
-r = df[df.id == uid].iloc[0]
+
+# Synchronize dropdown with map selection
+if map_id is not None and map_id in set(d.id):
+    st.session_state["point_id"] = map_id
+
+# Dropdown callback: changing the ID resets the map's selection state
+def on_point_change():
+    st.session_state["map_rev"] = (
+        st.session_state.get("map_rev", 0) + 1
+    )
+
+ids = d.sort_values(
+    "slope", key=abs, ascending=False
+).id.tolist()
+
+st.markdown(
+    "<p style='font-size:1.15rem; font-weight:800; color:#2563A6; "
+    "margin-bottom:6px;'>📍 Find a Location</p>",
+    unsafe_allow_html=True
+)
+
+selected_id = st.selectbox(
+    "Choose a data point (largest trends first)",
+    [None] + ids,
+    key="point_id",
+    format_func=lambda x: "None" if x is None else str(x),
+    on_change=on_point_change
+)
+
+clicked = selected_id
+uid = selected_id
+r = df[df.id == uid].iloc[0] if uid is not None else None
 
 # ---- Right-hand details panel: exists only while a point is selected
 if clicked is not None:
-    bench_ = json.load(open("data/benchmark_regions.json"))["regions"] if os.path.exists(
-        "data/benchmark_regions.json") else []
-    xr_ = xrows(r.lat, r.lon);
-    X = {x["key"]: x for x in xr_ if x["clear"]}
-    reg_ = find_region(R, clicked);
-    places = [n for n, bx in PRESETS.items() if bx and bx[0][0] <= r.lat <= bx[0][1] and bx[1][0] <= r.lon <= bx[1][1]]
-    places += [b_["name"] for b_ in bench_ if
-               b_["lat"][0] <= r.lat <= b_["lat"][1] and b_["lon"][0] <= r.lon <= b_["lon"][1]]
-    st.markdown("""<style>
-    .st-key-detail_panel{position:fixed;top:4rem;right:1rem;width:390px;max-height:calc(100vh - 5.5rem);overflow-y:auto;background:#FFFFFF;border:1px solid #D5E0EC;border-radius:14px;
-      box-shadow:0 10px 30px rgba(15,23,42,.20);padding:16px 18px;z-index:999;}
-    .st-key-detail_panel p,.st-key-detail_panel li,.st-key-detail_panel td,.st-key-detail_panel th{color:#1E293B !important;font-size:13.5px;}
-    [data-testid="stMain"] .block-container{padding-right:27rem !important;}
-    </style>""", unsafe_allow_html=True)
-    with st.container(key="detail_panel"):
-        st.markdown(
-            f"<div style='font-size:11px;letter-spacing:.08em;color:#64748B'>SELECTED DATA POINT</div><div style='font-size:20px;font-weight:800;color:#1E293B'>{C['label']}</div>"
-            f"<span style='background:{GRADE_COL[r.grade]};color:#fff;padding:2px 10px;border-radius:999px;font-weight:700'>Grade {r.grade}</span> "
-            f"<span style='color:#64748B'>{GRADE_NAME[r.grade]}</span>", unsafe_allow_html=True)
-        st.caption("Click an empty part of the map (or double-click) to close.")
-        st.markdown(f"**Location**  \nLatitude {r.lat:.2f}, longitude {r.lon:.2f} (unit {clicked})" + (
-            f"  \nWithin: {', '.join(places)}" if places else ""))
-        mu_ = float(series[str(clicked)].mean())  # results.csv has no "mean" column
-        pct_ = f"; about {r.slope * 10 / abs(mu_) * 100:.1f}% of its average level per decade" if C["pct"] and abs(mu_) > 1e-9 else ""
-        st.markdown(
-            f"**Trend**  \n{'Rising' if r.slope > 0 else 'Falling'} {abs(r.slope):.3g} {C['unit']} (95% interval {r.lo:.3g} to {r.hi:.3g}){pct_}.")
-        st.markdown(
-            f"**Significance**  \n{'Significant' if r.q < cp.Q else 'Not significant'} after false-discovery-rate control (Mann-Kendall p = {r.p:.3g}, q = {r.q:.3f}). "
-            f"The sign holds in {r.robust:.0%} of start/end windows; {int(r.n_years)} years of data" + (
-                f"; gap-step p = {r.step_p:.3g}" if pd.notna(r.step_p) else "") + ".")
-        st.markdown(f"**Why this grade**  \n{r.reason}")
-        st.markdown("**Mirror pair**")
-        if reg_ is None:
-            st.markdown("Not part of an A/B region, so no mirror analysis was run for this point.")
-        else:
-            pp_ = P[(P.up == reg_.region) | (P.down == reg_.region)] if len(P) else P
-            if pp_.empty:
-                st.markdown(
-                    f"Region {int(reg_.region)} ({int(reg_.n)} unit(s)) has no opposite-direction A/B region within 6,000 km: **no mirror pair**.")
-            else:
-                pp_ = pp_.assign(partner=np.where(pp_.up == reg_.region, pp_.down, pp_.up));
-                Rr_ = R.set_index("region");
-                o_ = Rr_.loc[pp_.iloc[0].partner]
-                st.markdown(
-                    f"**Yes.** Region {int(reg_.region)} has {len(pp_)} mirror partner(s). Best-supported: region {int(pp_.iloc[0].partner)} at {o_.lat:.1f}, {o_.lon:.1f}, "
-                    f"{pp_.iloc[0].km:.0f} km away, {'rising' if o_.slope > 0 else 'falling'} {abs(o_.slope):.3g} (grade {o_.grade}) while this side is {'rising' if reg_.slope > 0 else 'falling'}.")
-                also = mirror_also(feat, reg_, o_)
-                st.markdown("Features that also split in opposite directions: " + (
-                    ", ".join(also) if also else "none, so no other loaded feature explains the split."))
-        st.markdown("**What may be behind it** (association, not cause)")
-        for c_ in causes(feat, r, X): st.markdown("- " + c_)
-        st.markdown("**Other features here**")
-        st.markdown("| Feature | Direction | Grade |\n|---|---|---|\n" + "\n".join(
-            f"| {x['label']} | {('↑ rising' if x['sign'] > 0 else '↓ falling') if x['clear'] else 'no clear trend'} | {x['grade']} |"
-            for x in xr_))
-        xs_, ys_ = cp.annual(series[str(clicked)])
-        fp = go.Figure([go.Scatter(x=xs_, y=ys_, mode="markers+lines", showlegend=False),
-                        go.Scatter(x=xs_, y=np.median(ys_ - r.slope * xs_) + r.slope * xs_, line=dict(dash="dash"),
-                                   showlegend=False)])
-        fp.update_layout(height=170, margin=dict(l=0, r=0, t=6, b=0), xaxis_title=None, yaxis_title=None);
-        fp = style_plotly(fp)
-        st.plotly_chart(fp, width="stretch", key="panel-chart")
-        st.caption(
-            "Annual averages with the trend line (dashed) for this point: a compact version of the main trend chart below the map.")
-
-# ---- Inspector
-st.header(f"Trend details: {C['label']} at {r.lat:.1f}, {r.lon:.1f}")
-word = "rising" if r.slope > 0 else "falling"
-st.markdown(
-    f"**{C['label']} is {word} by {abs(r.slope):.3g} {C['unit']}** (95% interval {r.lo:.3g} to {r.hi:.3g}). **Grade {r.grade}:** {r.reason}")
-
-a, b = st.columns([2, 1])
-
-s = series[str(uid)]
-x, y = cp.annual(s)
-
-sd = s.dropna()
-sd = sd - sd.groupby(sd.index.month).transform("mean")
-
-f2 = go.Figure()
-
-f2.add_trace(go.Scatter(
-    x=sd.index.year + (sd.index.month - 1) / 12,
-    y=sd.values,
-    mode="lines",
-    name="monthly (deseasonalised)",
-    line=dict(color="#AAB7C4", width=2)
-))
-
-f2.add_trace(go.Scatter(
-    x=x,
-    y=y,
-    mode="markers+lines",
-    name="annual mean",
-    line=dict(width=2),
-    marker=dict(size=6)
-))
-
-f2.add_trace(go.Scatter(
-    x=x,
-    y=np.median(y - r.slope * x) + r.slope * x,
-    name="Theil-Sen trend",
-    line=dict(width=2, dash="dash")
-))
-
-if feat == "grace_lwe" and "gap" in meta and x.min() < meta["gap"][0] and x.max() > meta["gap"][1]:
-    f2.add_vrect(
-        x0=meta["gap"][0],
-        x1=meta["gap"][1],
-        fillcolor="grey",
-        opacity=0.3,
-        annotation_text="mission gap"
+    bench_ = (
+        json.load(open("data/benchmark_regions.json"))["regions"]
+        if os.path.exists("data/benchmark_regions.json")
+        else []
     )
 
-f2.update_layout(
-    height=340,
-    xaxis_title="year",
-    yaxis_title=C["unit"].split(" per")[0].split("/")[0]
-)
+    xr_ = xrows(r.lat, r.lon)
+    X = {x["key"]: x for x in xr_ if x["clear"]}
+    reg_ = find_region(R, clicked)
 
-f2 = style_plotly(f2)
+    # Identify preset and benchmark regions containing this point
+    places = [
+        n for n, bx in PRESETS.items()
+        if bx
+        and bx[0][0] <= r.lat <= bx[0][1]
+        and bx[1][0] <= r.lon <= bx[1][1]
+    ]
 
-a.plotly_chart(f2, width="stretch", key="trend-chart")
+    places += [
+        b_["name"] for b_ in bench_
+        if b_["lat"][0] <= r.lat <= b_["lat"][1]
+        and b_["lon"][0] <= r.lon <= b_["lon"][1]
+    ]
 
-b.table(pd.DataFrame({"value": [f"{r.slope:.4g}", f"{r.lo:.4g} to {r.hi:.4g}", f"{r.p:.4g}", f"{r.q:.4f}",
-                                f"{r.robust:.0%}", f"{int(r.n_years)}",
-                                f"{r.step_p:.3g}" if pd.notna(r.step_p) else "n/a"]},
-                     index=["Trend slope", "95% interval", "Mann-Kendall p", "FDR q", "Windows agreeing", "Years used",
-                            "Gap-step p"]))
-explain(
-    f"The grey line is the monthly value after removing the normal seasonal cycle. The dots are annual averages, which are what the statistics test. The dashed line is the Theil-Sen trend: the median slope between all pairs of years, so one odd year barely moves it."
-    + (" The grey band marks the gap between the GRACE and GRACE-FO satellites (mid-2017 to mid-2018)." if feat in (
-        "grace_lwe", "GW_ANOM") else ""),
-    "It lets you judge the trend with your own eyes: a steady drift is convincing, while a sudden jump across the satellite gap is a warning sign (an instrument offset or a real change), which is what grade D flags for a closer look. Annual averages are tested because month-to-month values are strongly linked, and testing them directly would overstate how certain the trend is.")
-n = len(x);
-H = np.full((n, n), np.nan)
-for i in range(n):
-    for j in range(i + cp.MINWIN - 1, n): H[i, j] = cp.sen(x[i:j + 1], y[i:j + 1])[0]
+    st.markdown("""<style>
+    .st-key-detail_panel {
+        position: fixed;
+        top: 4rem;
+        right: 1rem;
+        width: 390px;
+        max-height: calc(100vh - 5.5rem);
+        overflow-y: auto;
+        background: #FFFFFF;
+        border: 1px solid #D5E0EC;
+        border-radius: 14px;
+        box-shadow: 0 10px 30px rgba(15,23,42,.20);
+        padding: 16px 18px;
+        z-index: 999;
+    }
+    .st-key-detail_panel p,
+    .st-key-detail_panel li,
+    .st-key-detail_panel td,
+    .st-key-detail_panel th {
+        color: #1E293B !important;
+        font-size: 13.5px;
+    }
+    [data-testid="stMain"] .block-container {
+        padding-right: 27rem !important;
+    }
+    </style>""", unsafe_allow_html=True)
 
-hm = max(np.nanpercentile(np.abs(H), 95), 1e-9)
+    with st.container(key="detail_panel"):
 
-heatmap = px.imshow(
-    H,
-    x=x,
-    y=x,
-    color_continuous_scale=C["cmap"],
-    zmin=-hm,
-    zmax=hm,
-    labels=dict(
-        x="end year",
-        y="start year",
-        color="trend"
-    ),
-    title="Does the trend depend on the years chosen? (slope for every start/end year, >=10 years)"
-)
-
-heatmap.update_layout(height=380)
-heatmap = style_plotly(heatmap)
-
-st.plotly_chart(
-    heatmap,
-    width="stretch",
-    key="trend-heatmap"
-)
-explain(
-    "Each cell is the trend you would get using only the years from its row (start year) to its column (end year), for windows of at least 10 years, so only the upper-right triangle is filled. The colours use the same scale as the map.",
-    "This is the robustness check. If the whole triangle has one colour, the trend does not depend on which years you pick (grade A). If colours flip between red and blue, the answer changes with the window, so it is fragile (grade B) and could be a natural cycle such as a multi-year drought. About two decades of data can mistake a cycle for a trend, and this chart shows when that risk is real.")
-
-st.subheader("All features at this location")
-st.caption(
-    "The same place seen through every loaded feature. Features that move together (for example less rain and falling storage) support a story; features that disagree are worth a second look. 'No clear trend' means the grade was C or D.")
-rows = []
-for k in avail:
-    q, km = nearest(k, r.lat, r.lon)
-    if q is not None: rows.append({"feature": CAT[k]["label"], "trend": f"{q.slope:.3g} {CAT[k]['unit']}",
-                                   "direction": arrow(q.slope) if q.grade in "AB" else "no clear trend",
-                                   "grade": q.grade, "distance_km": round(km)})
-st.dataframe(pd.DataFrame(rows), hide_index=True)
-
-# ---- Mirror cases for this selection
-st.header("Mirror cases for this trend")
-region = None
-if len(R):
-    for _, g in R.iterrows():
-        if str(uid) in str(g.members).split(";"): region = g; break
-if region is None:
-    st.info("This location is not part of an A/B region, so it has no mirror analysis. Pick an A or B point.")
-else:
-    pp = P[(P.up == region.region) | (P.down == region.region)] if len(P) else P
-    st.write(
-        f"This location belongs to region {int(region.region)} ({int(region.n)} mascon(s), {arrow(region.slope)}, grade {region.grade}).")
-    if pp.empty:
-        st.write("No opposite-sign A/B region within 6,000 km: no mirror case for this trend.")
-    else:
-        pp = pp.assign(partner=np.where(pp.up == region.region, pp.down, pp.up));
-        Rr = R.set_index("region")
-        pick = st.selectbox("Mirror partner (best-supported first)", pp.partner.tolist(), format_func=lambda
-            i: f"region {int(i)} at {Rr.loc[i, 'lat']:.1f}, {Rr.loc[i, 'lon']:.1f} ({arrow(Rr.loc[i, 'slope'])})")
-        o = Rr.loc[pick];
-        km = float(pp[pp.partner == pick].km.iloc[0])
-        st.write(
-            f"**{CAT[feat]['label']} moves {arrow(region.slope)} here and {arrow(o.slope)} {km:.0f} km away** (partner grade {o.grade}, slope {o.slope:.3g}).")
-        mp = px.scatter_geo(pd.DataFrame(
-            {"lat": [region.lat, o.lat], "lon": [region.lon, o.lon], "side": ["selected", "mirror partner"]}),
-                            lat="lat", lon="lon", color="side")
-
-        mp.update_traces(marker=dict(size=12))
-
-        mp.update_geos(
-            fitbounds="locations",
-            showland=True,
-            landcolor="#FFFFFF",
-            showocean=True,
-            oceancolor="#D5F3FC",
-            showcountries=True,
-            countrycolor="#B9B9B9"
-        )
-
-        mp.update_layout(
-            height=300,
-            margin=dict(l=0, r=0, t=0, b=0)
-        )
-
-        mp = style_plotly(mp)
-        st.plotly_chart(mp, width="stretch", key="mirror-map")
-        explain(
-            f"The two markers are the selected region and its best mirror partner: two areas where {C['label'].lower()} moves in opposite directions, each with a trend graded A or B and within 6,000 km of each other.",
-            "This is the central idea of the challenge: the same process can push a variable up in one region and down in another. The table below checks whether other features split the same way, which points to a candidate explanation (association, never proof of cause).")
-        rows = []
-        for k in avail:
-            if k == feat: continue
-            q1, _ = nearest(k, region.lat, region.lon);
-            q2, _ = nearest(k, o.lat, o.lon)
-            if q1 is None or q2 is None: continue
-            c1_, c2_ = q1.grade in "AB", q2.grade in "AB"
-            verdict = (
-                "ALSO MIRRORS: opposite directions" if c1_ and c2_ and q1.sign != q2.sign else "same direction on both sides" if c1_ and c2_ else "trend clear on one side only" if c1_ or c2_ else "no clear trend")
-            rows.append({"feature": CAT[k]["label"], "here": arrow(q1.slope) if c1_ else "no clear trend",
-                         "partner": arrow(q2.slope) if c2_ else "no clear trend", "reading": verdict})
         st.markdown(
-            "**Which other features mirror too?** A feature that splits the same way is a candidate explanation (association only, never proof of cause).")
-        st.dataframe(pd.DataFrame(rows), hide_index=True)
+            f"<div style='font-size:11px;letter-spacing:.08em;color:#64748B'>"
+            f"SELECTED DATA POINT</div>"
+            f"<div style='font-size:20px;font-weight:800;color:#1E293B'>"
+            f"{C['label']}</div>"
+            f"<span style='background:{GRADE_COL[r.grade]};color:#fff;"
+            f"padding:2px 10px;border-radius:999px;font-weight:700'>"
+            f"Grade {r.grade}</span> "
+            f"<span style='color:#64748B'>{GRADE_NAME[r.grade]}</span>",
+            unsafe_allow_html=True
+        )
+
+        st.caption("Click an empty part of the map (or double-click) to close.")
+
+        # Look up the location only for this selected point
+        city, location_region, country = get_location(
+            round(float(r.lat), 4),
+            round(float(r.lon), 4)
+        )
+
+        location_parts = []
+
+        if city:
+            location_parts.append(city)
+
+        if location_region and location_region not in location_parts:
+            location_parts.append(location_region)
+
+        if country and country not in location_parts:
+            location_parts.append(country)
+
+        location_name = (
+            ", ".join(location_parts)
+            if location_parts
+            else "Location unavailable"
+        )
+
+        st.markdown(
+            f"**Location**  \n"
+            f"Nearest mapped place: {location_name}  \n"
+            f"Latitude {r.lat:.2f}, longitude {r.lon:.2f} (unit {clicked})"
+            + (
+                f"  \nWithin: {', '.join(places)}"
+                if places else ""
+            )
+        )
+
+        # Trend
+        mu_ = float(series[str(clicked)].mean())
+
+        pct_ = (
+            f"; about {r.slope * 10 / abs(mu_) * 100:.1f}% "
+            f"of its average level per decade"
+            if C["pct"] and abs(mu_) > 1e-9
+            else ""
+        )
+
+        st.markdown(
+            f"**Trend**  \n"
+            f"{'Rising' if r.slope > 0 else 'Falling'} "
+            f"{abs(r.slope):.3g} {C['unit']} "
+            f"(95% interval {r.lo:.3g} to {r.hi:.3g}){pct_}."
+        )
+
+        # Significance
+        st.markdown(
+            f"**Significance**  \n"
+            f"{'Significant' if r.q < cp.Q else 'Not significant'} "
+            f"after false-discovery-rate control "
+            f"(Mann-Kendall p = {r.p:.3g}, q = {r.q:.3f}). "
+            f"The sign holds in {r.robust:.0%} of start/end windows; "
+            f"{int(r.n_years)} years of data"
+            + (
+                f"; gap-step p = {r.step_p:.3g}"
+                if pd.notna(r.step_p)
+                else ""
+            )
+            + "."
+        )
+
+        # Evidence grade
+        st.markdown(
+            f"**Why this grade**  \n{r.reason}"
+        )
+
+        # Mirror pair
+        st.markdown("**Mirror pair**")
+
+        if reg_ is None:
+            st.markdown(
+                "Not part of an A/B region, so no mirror analysis "
+                "was run for this point."
+            )
+        else:
+            pp_ = (
+                P[(P.up == reg_.region) | (P.down == reg_.region)]
+                if len(P) else P
+            )
+
+            if pp_.empty:
+                st.markdown(
+                    f"Region {int(reg_.region)} ({int(reg_.n)} unit(s)) "
+                    f"has no opposite-direction A/B region within "
+                    f"6,000 km: **no mirror pair**."
+                )
+            else:
+                pp_ = pp_.assign(
+                    partner=np.where(
+                        pp_.up == reg_.region,
+                        pp_.down,
+                        pp_.up
+                    )
+                )
+
+                Rr_ = R.set_index("region")
+                o_ = Rr_.loc[pp_.iloc[0].partner]
+
+                st.markdown(
+                    f"**Yes.** Region {int(reg_.region)} has "
+                    f"{len(pp_)} mirror partner(s). Best-supported: "
+                    f"region {int(pp_.iloc[0].partner)} at "
+                    f"{o_.lat:.1f}, {o_.lon:.1f}, "
+                    f"{pp_.iloc[0].km:.0f} km away, "
+                    f"{'rising' if o_.slope > 0 else 'falling'} "
+                    f"{abs(o_.slope):.3g} (grade {o_.grade}) while "
+                    f"this side is "
+                    f"{'rising' if reg_.slope > 0 else 'falling'}."
+                )
+
+                also = mirror_also(feat, reg_, o_)
+
+                st.markdown(
+                    "Features that also split in opposite directions: "
+                    + (
+                        ", ".join(also)
+                        if also
+                        else "none, so no other loaded feature explains the split."
+                    )
+                )
+
+        # Possible explanations
+        st.markdown("**What may be behind it** (association, not cause)")
+
+        for c_ in causes(feat, r, X):
+            st.markdown("- " + c_)
+
+        # Other features
+        st.markdown("**Other features here**")
+
+        st.markdown(
+            "| Feature | Direction | Grade |\n"
+            "|---|---|---|\n"
+            + "\n".join(
+                f"| {x['label']} | "
+                f"{('↑ rising' if x['sign'] > 0 else '↓ falling') if x['clear'] else 'no clear trend'} | "
+                f"{x['grade']} |"
+                for x in xr_
+            )
+        )
+
+        # Annual trend chart
+        xs_, ys_ = cp.annual(series[str(clicked)])
+
+        fp = go.Figure([
+            go.Scatter(
+                x=xs_,
+                y=ys_,
+                mode="markers+lines",
+                showlegend=False
+            ),
+            go.Scatter(
+                x=xs_,
+                y=np.median(ys_ - r.slope * xs_) + r.slope * xs_,
+                line=dict(dash="dash"),
+                showlegend=False
+            )
+        ])
+
+        fp.update_layout(
+            height=170,
+            margin=dict(l=0, r=0, t=6, b=0),
+            xaxis_title=None,
+            yaxis_title=None
+        )
+
+        fp = style_plotly(fp)
+
+        st.plotly_chart(
+            fp,
+            width="stretch",
+            key="panel-chart"
+        )
+
+        st.caption(
+            "Annual averages with the trend line (dashed) for this point: "
+            "a compact version of the main trend chart below the map."
+        )
+
+# ---- Inspector
+if clicked is not None:
+    st.header(f"Trend details: {C['label']} at {r.lat:.1f}, {r.lon:.1f}")
+    word = "rising" if r.slope > 0 else "falling"
+    st.markdown(
+        f"**{C['label']} is {word} by {abs(r.slope):.3g} {C['unit']}** (95% interval {r.lo:.3g} to {r.hi:.3g}). **Grade {r.grade}:** {r.reason}")
+
+    a, b = st.columns([2, 1])
+
+    s = series[str(uid)]
+    x, y = cp.annual(s)
+
+    sd = s.dropna()
+    sd = sd - sd.groupby(sd.index.month).transform("mean")
+
+    f2 = go.Figure()
+
+    f2.add_trace(go.Scatter(
+        x=sd.index.year + (sd.index.month - 1) / 12,
+        y=sd.values,
+        mode="lines",
+        name="monthly (deseasonalised)",
+        line=dict(color="#AAB7C4", width=2)
+    ))
+
+    f2.add_trace(go.Scatter(
+        x=x,
+        y=y,
+        mode="markers+lines",
+        name="annual mean",
+        line=dict(width=2),
+        marker=dict(size=6)
+    ))
+
+    f2.add_trace(go.Scatter(
+        x=x,
+        y=np.median(y - r.slope * x) + r.slope * x,
+        name="Theil-Sen trend",
+        line=dict(width=2, dash="dash")
+    ))
+
+    if feat == "grace_lwe" and "gap" in meta and x.min() < meta["gap"][0] and x.max() > meta["gap"][1]:
+        f2.add_vrect(
+            x0=meta["gap"][0],
+            x1=meta["gap"][1],
+            fillcolor="grey",
+            opacity=0.3,
+            annotation_text="mission gap"
+        )
+
+    f2.update_layout(
+        height=340,
+        xaxis_title="year",
+        yaxis_title=C["unit"].split(" per")[0].split("/")[0]
+    )
+
+    f2 = style_plotly(f2)
+
+    a.plotly_chart(f2, width="stretch", key="trend-chart")
+
+    b.table(pd.DataFrame({"value": [f"{r.slope:.4g}", f"{r.lo:.4g} to {r.hi:.4g}", f"{r.p:.4g}", f"{r.q:.4f}",
+                                    f"{r.robust:.0%}", f"{int(r.n_years)}",
+                                    f"{r.step_p:.3g}" if pd.notna(r.step_p) else "n/a"]},
+                        index=["Trend slope", "95% interval", "Mann-Kendall p", "FDR q", "Windows agreeing", "Years used",
+                                "Gap-step p"]))
+    explain(
+        f"The grey line is the monthly value after removing the normal seasonal cycle. The dots are annual averages, which are what the statistics test. The dashed line is the Theil-Sen trend: the median slope between all pairs of years, so one odd year barely moves it."
+        + (" The grey band marks the gap between the GRACE and GRACE-FO satellites (mid-2017 to mid-2018)." if feat in (
+            "grace_lwe", "GW_ANOM") else ""),
+        "It lets you judge the trend with your own eyes: a steady drift is convincing, while a sudden jump across the satellite gap is a warning sign (an instrument offset or a real change), which is what grade D flags for a closer look. Annual averages are tested because month-to-month values are strongly linked, and testing them directly would overstate how certain the trend is.")
+    n = len(x);
+    H = np.full((n, n), np.nan)
+    for i in range(n):
+        for j in range(i + cp.MINWIN - 1, n): H[i, j] = cp.sen(x[i:j + 1], y[i:j + 1])[0]
+
+    hm = max(np.nanpercentile(np.abs(H), 95), 1e-9)
+
+    heatmap = px.imshow(
+        H,
+        x=x,
+        y=x,
+        color_continuous_scale=C["cmap"],
+        zmin=-hm,
+        zmax=hm,
+        labels=dict(
+            x="end year",
+            y="start year",
+            color="trend"
+        ),
+        title="Does the trend depend on the years chosen? (slope for every start/end year, >=10 years)"
+    )
+
+    heatmap.update_layout(height=380)
+    heatmap = style_plotly(heatmap)
+
+    st.plotly_chart(
+        heatmap,
+        width="stretch",
+        key="trend-heatmap"
+    )
+    explain(
+        "Each cell is the trend you would get using only the years from its row (start year) to its column (end year), for windows of at least 10 years, so only the upper-right triangle is filled. The colours use the same scale as the map.",
+        "This is the robustness check. If the whole triangle has one colour, the trend does not depend on which years you pick (grade A). If colours flip between red and blue, the answer changes with the window, so it is fragile (grade B) and could be a natural cycle such as a multi-year drought. About two decades of data can mistake a cycle for a trend, and this chart shows when that risk is real.")
+
+    st.subheader("All features at this location")
+    st.caption(
+        "The same place seen through every loaded feature. Features that move together (for example less rain and falling storage) support a story; features that disagree are worth a second look. 'No clear trend' means the grade was C or D.")
+    rows = []
+    for k in avail:
+        q, km = nearest(k, r.lat, r.lon)
+        if q is not None: rows.append({"feature": CAT[k]["label"], "trend": f"{q.slope:.3g} {CAT[k]['unit']}",
+                                    "direction": arrow(q.slope) if q.grade in "AB" else "no clear trend",
+                                    "grade": q.grade, "distance_km": round(km)})
+    st.dataframe(pd.DataFrame(rows), hide_index=True)
+
+
+    # ---- Mirror cases for this selection
+    st.header("Mirror cases for this trend")
+
+    region = None
+
+    if len(R):
+        for _, g in R.iterrows():
+            if str(uid) in str(g.members).split(";"):
+                region = g
+                break
+
+    if region is None:
+        st.info(
+            "This location is not part of an A/B region, "
+            "so it has no mirror analysis. Pick an A or B point."
+        )
+
+    else:
+        st.write(
+            f"This location belongs to region {int(region.region)} "
+            f"({int(region.n)} mascon(s), {arrow(region.slope)}, "
+            f"grade {region.grade})."
+        )
+
+        pp = (
+            P[(P.up == region.region) | (P.down == region.region)]
+            if len(P) else P
+        )
+
+        if pp.empty:
+            st.write(
+                "No opposite-sign A/B region within 6,000 km: "
+                "no mirror case for this trend."
+            )
+
+        else:
+            pp = pp.assign(
+                partner=np.where(
+                    pp.up == region.region,
+                    pp.down,
+                    pp.up
+                )
+            )
+
+            Rr = R.set_index("region")
+
+            pick = st.selectbox(
+                "Mirror partner (best-supported first)",
+                pp.partner.tolist(),
+                format_func=lambda i:
+                    f"region {int(i)} at "
+                    f"{Rr.loc[i, 'lat']:.1f}, {Rr.loc[i, 'lon']:.1f} "
+                    f"({arrow(Rr.loc[i, 'slope'])})"
+            )
+
+            o = Rr.loc[pick]
+            km = float(pp[pp.partner == pick].km.iloc[0])
+
+            st.write(
+                f"**{CAT[feat]['label']} moves {arrow(region.slope)} here "
+                f"and {arrow(o.slope)} {km:.0f} km away** "
+                f"(partner grade {o.grade}, slope {o.slope:.3g})."
+            )
+
+            # Mirror map
+            mp = px.scatter_geo(
+                pd.DataFrame({
+                    "lat": [region.lat, o.lat],
+                    "lon": [region.lon, o.lon],
+                    "side": ["selected", "mirror partner"]
+                }),
+                lat="lat",
+                lon="lon",
+                color="side"
+            )
+
+            mp.update_traces(marker=dict(size=12))
+
+            mp.update_geos(
+                fitbounds="locations",
+                showland=True,
+                landcolor="#FFFFFF",
+                showocean=True,
+                oceancolor="#D5F3FC",
+                showcountries=True,
+                countrycolor="#B9B9B9"
+            )
+
+            mp.update_layout(
+                height=300,
+                margin=dict(l=0, r=0, t=0, b=0)
+            )
+
+            mp = style_plotly(mp)
+            st.plotly_chart(mp, width="stretch", key="mirror-map")
+
+            explain(
+                f"The two markers are the selected region and its best mirror partner: "
+                f"two areas where {C['label'].lower()} moves in opposite directions, "
+                "each with a trend graded A or B and within 6,000 km of each other.",
+                "This is the central idea of the challenge: the same process can "
+                "push a variable up in one region and down in another. We compare "
+                "other features across both locations to look for possible "
+                "explanations (association, never proof of cause)."
+            )
+
+            # Compare other features
+            rows = []
+
+            for k in avail:
+                if k == feat:
+                    continue
+
+                q1, _ = nearest(k, region.lat, region.lon)
+                q2, _ = nearest(k, o.lat, o.lon)
+
+                if q1 is None or q2 is None:
+                    continue
+
+                c1_, c2_ = q1.grade in "AB", q2.grade in "AB"
+
+                verdict = (
+                    "ALSO MIRRORS: opposite directions"
+                    if c1_ and c2_ and q1.sign != q2.sign
+                    else "same direction on both sides"
+                    if c1_ and c2_
+                    else "trend clear on one side only"
+                    if c1_ or c2_
+                    else "no clear trend"
+                )
+
+                rows.append({
+                    "feature": CAT[k]["label"],
+                    "here": arrow(q1.slope) if c1_ else "no clear trend",
+                    "partner": arrow(q2.slope) if c2_ else "no clear trend",
+                    "reading": verdict
+                })
+
+            # Show only features that also mirror
+            mirrored_rows = [
+                row for row in rows
+                if row["reading"] == "ALSO MIRRORS: opposite directions"
+            ]
+
+            if mirrored_rows:
+                st.markdown(
+                    "**Which other features mirror too?** "
+                    "A feature that splits the same way is a candidate explanation "
+                    "(association only, never proof of cause)."
+                )
+
+                st.dataframe(
+                    pd.DataFrame(mirrored_rows),
+                    hide_index=True
+                )
+else:
+    st.header("Trend details")
+    st.caption("Select a point on the map to view its trend analysis.")
+
+    # Empty trend graph
+    empty = go.Figure()
+    empty.update_layout(
+        height=340,
+        annotations=[dict(
+            text="Select a point on the map to view its trend",
+            x=0.5, y=0.5,
+            xref="paper", yref="paper",
+            showarrow=False
+        )]
+    )
+    st.plotly_chart(style_plotly(empty), width="stretch")
+
+    st.subheader("Trend robustness")
+    blank = go.Figure()
+    blank.update_layout(
+        height=380,
+        annotations=[dict(
+            text="Select a point to view the robustness heatmap",
+            x=0.5, y=0.5,
+            xref="paper", yref="paper",
+            showarrow=False
+        )]
+    )
+    st.plotly_chart(style_plotly(blank), width="stretch")
+
+    st.subheader("All features at this location")
+    st.caption("Select a point to compare other features.")
+
+    st.header("Mirror cases for this trend")
+    st.caption("Select a point to explore opposite-direction regions.")
+
 
 # ---- Benchmark + methods
 if os.path.exists(f"{O}/benchmark.csv") and os.path.exists(f"{O}/sources.json"):
@@ -530,28 +955,44 @@ Fire counts are MODIS detections, not burned area, and are affected by cloud cov
 # ---- Bottom navigation
 st.markdown("---")
 
-nav1, nav2, nav3 = st.columns(3)
+nav1, nav2, nav3, nav4, nav5 = st.columns(5)
 
 with nav1:
     if st.button(
-            "📊 Explore Our Data",
-            key="data_button",
-            use_container_width=True
+        "📊 Explore Our Data",
+        key="data_button",
+        use_container_width=True
     ):
         st.switch_page("pages/data.py")
 
 with nav2:
     if st.button(
-            "📐 Methodology & Evidence",
-            key="methodology_button",
-            use_container_width=True
+        "🔁 Crosscheck",
+        key="crosscheck_button",
+        use_container_width=True
     ):
-        st.switch_page("pages/methods.py")
+        st.switch_page("pages/cross_check.py")
 
 with nav3:
     if st.button(
-            "🌎 Meet the Team & View Credits",
-            key="credits_button",
-            use_container_width=True
+        "📐 Methodology & Evidence",
+        key="methodology_button",
+        use_container_width=True
+    ):
+        st.switch_page("pages/methods.py")
+
+with nav4:
+    if st.button(
+        "📖 User Guide",
+        key="guide_button",
+        use_container_width=True
+    ):
+        st.switch_page("pages/user_guide.py")
+
+with nav5:
+    if st.button(
+        "🌎 Meet the Team & View Credits",
+        key="credits_button",
+        use_container_width=True
     ):
         st.switch_page("pages/credits.py")

@@ -74,11 +74,14 @@ st.markdown(
 with st.expander("GRACE and GRACE-FO — Gravity Recovery and Climate Experiment", expanded=True):
     st.markdown(
         """
-        **Provider:** NASA and the German Research Centre for Geosciences (GFZ),
-        with data products distributed through NASA's Physical Oceanography
-        Distributed Active Archive Center (PO.DAAC).
+        **Provider:** NASA/JPL; GRACE-FO is a partnership between NASA and GFZ,
+        with DLR operating the mission. Data products are distributed through
+        NASA's Physical Oceanography Distributed Active Archive Center (PO.DAAC).
 
         **Product used:** JPL GRACE and GRACE-FO Mascon RL06.3 (CRI-filtered, version 4).
+
+        **Creators:** Wiese, Yuan, Boening, Landerer, Watkins (JPL).
+        **DOI:** [10.5067/TEMSC-3JC634](https://doi.org/10.5067/TEMSC-3JC634)
 
         **How it is used:** GRACE/GRACE-FO gravity observations are used to
         estimate changes in terrestrial water storage. These measurements
@@ -146,6 +149,21 @@ with st.expander("NASA POWER — Prediction Of Worldwide Energy Resources"):
         """
     )
 
+with st.expander("GLDAS — Global Land Data Assimilation System (optional layer)"):
+    st.markdown(
+        """
+        **Provider:** NASA Goddard Space Flight Center, distributed through
+        NASA GES DISC (GLDAS Noah Land Surface Model L4 monthly 0.25 degree, version 2.1).
+
+        **How it is used:** Only for the optional groundwater-style anomaly,
+        where GLDAS soil moisture, snow and canopy water are subtracted from
+        GRACE total water storage. This is model output, and the result is
+        indicative only.
+
+        **Data access:** [NASA GES DISC — GLDAS](https://disc.gsfc.nasa.gov/datasets?keywords=GLDAS)
+        """
+    )
+
 with st.expander("NASA FIRMS — Fire Information for Resource Management System"):
     st.markdown(
         """
@@ -157,6 +175,20 @@ with st.expander("NASA FIRMS — Fire Information for Resource Management System
         of every fire or a direct burned-area measurement.
 
         **Data access:** [NASA FIRMS](https://firms.modaps.eosdis.nasa.gov/)
+        """
+    )
+
+with st.expander("OpenStreetMap / Nominatim — place names"):
+    st.markdown(
+        """
+        **Provider:** OpenStreetMap contributors, via the Nominatim geocoding service.
+
+        **How it is used:** Place names for a selected map point are looked up
+        by reverse geocoding. Place names from OpenStreetMap contributors via
+        Nominatim (© OpenStreetMap contributors).
+
+        **Data access:** [OpenStreetMap](https://www.openstreetmap.org/copyright) ·
+        [Nominatim](https://nominatim.org/)
         """
     )
 
@@ -172,6 +204,11 @@ technology_items = [
     ("Earthaccess", "Access to supported NASA Earthdata resources"),
     ("SciPy and xarray", "Statistical functions and NetCDF data handling"),
     ("Requests", "Retrieval from NASA POWER and FIRMS web services"),
+    ("geopy", "Reverse geocoding of selected map points (Nominatim)"),
+    ("pymannkendall", "Hamed-Rao modified Mann-Kendall cross-check"),
+    ("netCDF4", "Reading NetCDF files"),
+    ("Matplotlib", "Plotting support"),
+    ("pytest", "Regression tests"),
 ]
 
 for technology, purpose in technology_items:

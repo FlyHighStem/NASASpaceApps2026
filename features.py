@@ -22,6 +22,7 @@ O = "output"
 V = f"{O}/vars"
 NOGAP = (1e9, 1e9 + 1)
 RE = "Reanalysis (MERRA-2 via NASA POWER)"
+FIRMS_DAYS = 10   # FIRMS area API DAY_RANGE (the current docs allow 1-10). If you already cached 5-day windows, set this back to 5 to reuse them.
 
 
 def _c(label, group, unit, cmap, kind, desc, pct=True, fd=0):
@@ -382,12 +383,12 @@ def fires(csvs=None, key=None, bbox=None, start=2002, end=2025, jobs=1):
 
         w, s, e, n = bbox
 
-        # FIRMS area API day range must be 1–5.
-        # Step by five days so the requested windows cover the period.
+        # FIRMS area API DAY_RANGE accepts 1-10 days (FIRMS API docs).
+        # Step by FIRMS_DAYS so consecutive windows cover the period without gaps.
         days = pd.date_range(
             f"{start}-01-01",
             f"{end}-12-31",
-            freq="5D"
+            freq=f"{FIRMS_DAYS}D"
         )
 
         import time
@@ -396,13 +397,15 @@ def fires(csvs=None, key=None, bbox=None, start=2002, end=2025, jobs=1):
         def one(d):
             """One 5-day window. Cached on disk, so a rerun only fetches what is missing.
             FIRMS limits requests per 10 minutes: on that error, wait and retry instead of aborting."""
-            fn = f"{O}/cache/firms/{w}_{s}_{e}_{n}_{d.date()}.csv"
+            # The window length is part of the cache name (5-day files keep the old name), so files
+            # cached for one window length are never reused for another.
+            fn = f"{O}/cache/firms/{w}_{s}_{e}_{n}_{d.date()}" + ("" if FIRMS_DAYS == 5 else f"_{FIRMS_DAYS}d") + ".csv"
             if os.path.exists(fn):
                 t = open(fn).read()
             else:
                 url = (
                     "https://firms.modaps.eosdis.nasa.gov/api/area/csv/"
-                    f"{key}/MODIS_SP/{w},{s},{e},{n}/5/{d.date()}"
+                    f"{key}/MODIS_SP/{w},{s},{e},{n}/{FIRMS_DAYS}/{d.date()}"
                 )
                 t = None
                 for attempt in range(40):

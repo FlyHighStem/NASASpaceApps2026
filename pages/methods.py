@@ -92,7 +92,9 @@ with st.expander("Overview of the analysis process", expanded=True):
            them for the statistical trend tests. A year counts only if it
            has at least 9 months of data (peak-season fire series use their
            3 peak months), so the years inside the GRACE to GRACE-FO gap
-           normally drop out.
+           normally drop out. Because partial years are excluded, the
+           statistics for every feature use complete years only (through
+           2025 in this run), even where a source file extends into 2026.
 
         4. **Trend estimation:** Estimate the direction and magnitude
            of change using the Theil-Sen estimator.
@@ -351,7 +353,7 @@ with st.expander("GRACE Mission-Gap Test"):
         that coincides with the gap. It cannot tell an instrument offset
         from a real change that is accelerating or happens to straddle
         the gap. Treat D as "check this one", and compare with a smooth
-        curve (see `tools/diagnose_box.py`) before calling it an artifact.
+        curve fitted through the gap before calling it an artifact.
         """
     )
 
