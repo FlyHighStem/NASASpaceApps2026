@@ -270,7 +270,7 @@ fig.update_traces(
     # Selected point: drawn larger and fully opaque; the others fade. (Plotly's built-in selected style cannot thicken
     # an outline, and adding a ring trace makes Streamlit clear the selection, which would close the details panel.)
     selected=dict(marker=dict(size=17, opacity=1)),
-    unselected=dict(marker=dict(opacity=0.3)),
+    unselected=dict(marker=dict(opacity=0.2)),
 )
 
 fig.update_geos(
@@ -319,6 +319,25 @@ for trace in fig.data:
             i for i, point_id in enumerate(trace_ids)
             if point_id == selected_id
         ] if selected_id is not None else None
+        
+# Add a small red center dot to the selected point
+if selected_id is not None:
+    selected_row = d[d.id == selected_id]
+
+    if not selected_row.empty:
+        fig.add_trace(go.Scattergeo(
+            lat=selected_row["lat"],
+            lon=selected_row["lon"],
+            mode="markers",
+            marker=dict(
+                size=4,
+                color="#FF0000",
+                symbol="circle"
+            ),
+            customdata=[[int(selected_id)]],
+            hoverinfo="skip",
+            showlegend=False
+        ))
 
 map_key = f"map-{region}-{rev}"
 
@@ -347,7 +366,9 @@ except (IndexError, KeyError, TypeError, ValueError):
 
 # Synchronize dropdown with map selection
 if map_id is not None and map_id in set(d.id):
-    st.session_state["point_id"] = map_id
+    if st.session_state.get("point_id") != map_id:
+        st.session_state["point_id"] = map_id
+        st.rerun()
 
 # Dropdown callback: changing the ID resets the map's selection state
 def on_point_change():
