@@ -10,3 +10,4 @@ earthaccess
 pymannkendall
 matplotlib
 pytest
+geopy

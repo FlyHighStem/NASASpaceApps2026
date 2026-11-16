@@ -2,6 +2,8 @@
 import json, os, numpy as np, pandas as pd, streamlit as st, plotly.express as px, plotly.graph_objects as go
 import counterpoint as cp, features as ft
 import pipeline
+from geopy.geocoders import Nominatim
+from geopy.extra.rate_limiter import RateLimiter
 
 os.chdir(pipeline.ROOT)  # run from the project folder no matter where streamlit was launched
 O = "output";
@@ -90,6 +92,61 @@ def load(k):
     rd = lambda n: pd.read_csv(f"{V}/{k}/{n}.csv") if os.path.getsize(f"{V}/{k}/{n}.csv") > 5 else pd.DataFrame()
     return rd("results"), pd.read_csv(f"{V}/{k}/series.csv", index_col=0, parse_dates=True), rd("regions"), rd(
         "pairs"), json.load(open(f"{V}/{k}/meta.json"))
+
+
+# ---- Reverse geocoding: only called for a selected map point
+_geolocator = Nominatim(
+    user_agent="counterpoint_earth_system_trend_detective",
+    timeout=15
+)
+
+_reverse = RateLimiter(
+    _geolocator.reverse,
+    min_delay_seconds=1,
+    max_retries=2,
+    error_wait_seconds=2,
+    swallow_exceptions=False
+)
+
+@st.cache_data(ttl=86400)
+def get_location(lat, lon):
+    try:
+        result = _geolocator.reverse(
+            (lat, lon),
+            exactly_one=True,
+            language="en",
+            timeout=15
+        )
+
+        if result is None:
+            return None, None, None
+
+        address = result.raw.get("address", {})
+
+        place = (
+            address.get("city")
+            or address.get("town")
+            or address.get("village")
+            or address.get("municipality")
+            or address.get("county")
+            or address.get("road")
+            or result.raw.get("name")
+        )
+
+        region = (
+            address.get("state")
+            or address.get("province")
+            or address.get("region")
+            or address.get("state_district")
+        )
+
+        country = address.get("country")
+
+        return place, region, country
+
+    except Exception as e:
+        st.error(f"Geocoding error: {type(e).__name__}: {e}")
+        return None, None, None
 
 
 def nearest(k, lat, lon, maxkm=700):
@@ -270,70 +327,256 @@ r = df[df.id == uid].iloc[0]
 
 # ---- Right-hand details panel: exists only while a point is selected
 if clicked is not None:
-    bench_ = json.load(open("data/benchmark_regions.json"))["regions"] if os.path.exists(
-        "data/benchmark_regions.json") else []
-    xr_ = xrows(r.lat, r.lon);
+    bench_ = (
+        json.load(open("data/benchmark_regions.json"))["regions"]
+        if os.path.exists("data/benchmark_regions.json")
+        else []
+    )
+
+    xr_ = xrows(r.lat, r.lon)
     X = {x["key"]: x for x in xr_ if x["clear"]}
-    reg_ = find_region(R, clicked);
-    places = [n for n, bx in PRESETS.items() if bx and bx[0][0] <= r.lat <= bx[0][1] and bx[1][0] <= r.lon <= bx[1][1]]
-    places += [b_["name"] for b_ in bench_ if
-               b_["lat"][0] <= r.lat <= b_["lat"][1] and b_["lon"][0] <= r.lon <= b_["lon"][1]]
+    reg_ = find_region(R, clicked)
+
+    # Identify preset and benchmark regions containing this point
+    places = [
+        n for n, bx in PRESETS.items()
+        if bx
+        and bx[0][0] <= r.lat <= bx[0][1]
+        and bx[1][0] <= r.lon <= bx[1][1]
+    ]
+
+    places += [
+        b_["name"] for b_ in bench_
+        if b_["lat"][0] <= r.lat <= b_["lat"][1]
+        and b_["lon"][0] <= r.lon <= b_["lon"][1]
+    ]
+
     st.markdown("""<style>
-    .st-key-detail_panel{position:fixed;top:4rem;right:1rem;width:390px;max-height:calc(100vh - 5.5rem);overflow-y:auto;background:#FFFFFF;border:1px solid #D5E0EC;border-radius:14px;
-      box-shadow:0 10px 30px rgba(15,23,42,.20);padding:16px 18px;z-index:999;}
-    .st-key-detail_panel p,.st-key-detail_panel li,.st-key-detail_panel td,.st-key-detail_panel th{color:#1E293B !important;font-size:13.5px;}
-    [data-testid="stMain"] .block-container{padding-right:27rem !important;}
+    .st-key-detail_panel {
+        position: fixed;
+        top: 4rem;
+        right: 1rem;
+        width: 390px;
+        max-height: calc(100vh - 5.5rem);
+        overflow-y: auto;
+        background: #FFFFFF;
+        border: 1px solid #D5E0EC;
+        border-radius: 14px;
+        box-shadow: 0 10px 30px rgba(15,23,42,.20);
+        padding: 16px 18px;
+        z-index: 999;
+    }
+    .st-key-detail_panel p,
+    .st-key-detail_panel li,
+    .st-key-detail_panel td,
+    .st-key-detail_panel th {
+        color: #1E293B !important;
+        font-size: 13.5px;
+    }
+    [data-testid="stMain"] .block-container {
+        padding-right: 27rem !important;
+    }
     </style>""", unsafe_allow_html=True)
+
     with st.container(key="detail_panel"):
+
         st.markdown(
-            f"<div style='font-size:11px;letter-spacing:.08em;color:#64748B'>SELECTED DATA POINT</div><div style='font-size:20px;font-weight:800;color:#1E293B'>{C['label']}</div>"
-            f"<span style='background:{GRADE_COL[r.grade]};color:#fff;padding:2px 10px;border-radius:999px;font-weight:700'>Grade {r.grade}</span> "
-            f"<span style='color:#64748B'>{GRADE_NAME[r.grade]}</span>", unsafe_allow_html=True)
+            f"<div style='font-size:11px;letter-spacing:.08em;color:#64748B'>"
+            f"SELECTED DATA POINT</div>"
+            f"<div style='font-size:20px;font-weight:800;color:#1E293B'>"
+            f"{C['label']}</div>"
+            f"<span style='background:{GRADE_COL[r.grade]};color:#fff;"
+            f"padding:2px 10px;border-radius:999px;font-weight:700'>"
+            f"Grade {r.grade}</span> "
+            f"<span style='color:#64748B'>{GRADE_NAME[r.grade]}</span>",
+            unsafe_allow_html=True
+        )
+
         st.caption("Click an empty part of the map (or double-click) to close.")
-        st.markdown(f"**Location**  \nLatitude {r.lat:.2f}, longitude {r.lon:.2f} (unit {clicked})" + (
-            f"  \nWithin: {', '.join(places)}" if places else ""))
-        mu_ = float(series[str(clicked)].mean())  # results.csv has no "mean" column
-        pct_ = f"; about {r.slope * 10 / abs(mu_) * 100:.1f}% of its average level per decade" if C["pct"] and abs(mu_) > 1e-9 else ""
+
+        # Look up the location only for this selected point
+        city, location_region, country = get_location(
+            round(float(r.lat), 4),
+            round(float(r.lon), 4)
+        )
+
+        location_parts = []
+
+        if city:
+            location_parts.append(city)
+
+        if location_region and location_region not in location_parts:
+            location_parts.append(location_region)
+
+        if country and country not in location_parts:
+            location_parts.append(country)
+
+        location_name = (
+            ", ".join(location_parts)
+            if location_parts
+            else "Location unavailable"
+        )
+
         st.markdown(
-            f"**Trend**  \n{'Rising' if r.slope > 0 else 'Falling'} {abs(r.slope):.3g} {C['unit']} (95% interval {r.lo:.3g} to {r.hi:.3g}){pct_}.")
+            f"**Location**  \n"
+            f"Nearest mapped place: {location_name}  \n"
+            f"Latitude {r.lat:.2f}, longitude {r.lon:.2f} (unit {clicked})"
+            + (
+                f"  \nWithin: {', '.join(places)}"
+                if places else ""
+            )
+        )
+
+        # Trend
+        mu_ = float(series[str(clicked)].mean())
+
+        pct_ = (
+            f"; about {r.slope * 10 / abs(mu_) * 100:.1f}% "
+            f"of its average level per decade"
+            if C["pct"] and abs(mu_) > 1e-9
+            else ""
+        )
+
         st.markdown(
-            f"**Significance**  \n{'Significant' if r.q < cp.Q else 'Not significant'} after false-discovery-rate control (Mann-Kendall p = {r.p:.3g}, q = {r.q:.3f}). "
-            f"The sign holds in {r.robust:.0%} of start/end windows; {int(r.n_years)} years of data" + (
-                f"; gap-step p = {r.step_p:.3g}" if pd.notna(r.step_p) else "") + ".")
-        st.markdown(f"**Why this grade**  \n{r.reason}")
+            f"**Trend**  \n"
+            f"{'Rising' if r.slope > 0 else 'Falling'} "
+            f"{abs(r.slope):.3g} {C['unit']} "
+            f"(95% interval {r.lo:.3g} to {r.hi:.3g}){pct_}."
+        )
+
+        # Significance
+        st.markdown(
+            f"**Significance**  \n"
+            f"{'Significant' if r.q < cp.Q else 'Not significant'} "
+            f"after false-discovery-rate control "
+            f"(Mann-Kendall p = {r.p:.3g}, q = {r.q:.3f}). "
+            f"The sign holds in {r.robust:.0%} of start/end windows; "
+            f"{int(r.n_years)} years of data"
+            + (
+                f"; gap-step p = {r.step_p:.3g}"
+                if pd.notna(r.step_p)
+                else ""
+            )
+            + "."
+        )
+
+        # Evidence grade
+        st.markdown(
+            f"**Why this grade**  \n{r.reason}"
+        )
+
+        # Mirror pair
         st.markdown("**Mirror pair**")
+
         if reg_ is None:
-            st.markdown("Not part of an A/B region, so no mirror analysis was run for this point.")
+            st.markdown(
+                "Not part of an A/B region, so no mirror analysis "
+                "was run for this point."
+            )
         else:
-            pp_ = P[(P.up == reg_.region) | (P.down == reg_.region)] if len(P) else P
+            pp_ = (
+                P[(P.up == reg_.region) | (P.down == reg_.region)]
+                if len(P) else P
+            )
+
             if pp_.empty:
                 st.markdown(
-                    f"Region {int(reg_.region)} ({int(reg_.n)} unit(s)) has no opposite-direction A/B region within 6,000 km: **no mirror pair**.")
+                    f"Region {int(reg_.region)} ({int(reg_.n)} unit(s)) "
+                    f"has no opposite-direction A/B region within "
+                    f"6,000 km: **no mirror pair**."
+                )
             else:
-                pp_ = pp_.assign(partner=np.where(pp_.up == reg_.region, pp_.down, pp_.up));
-                Rr_ = R.set_index("region");
+                pp_ = pp_.assign(
+                    partner=np.where(
+                        pp_.up == reg_.region,
+                        pp_.down,
+                        pp_.up
+                    )
+                )
+
+                Rr_ = R.set_index("region")
                 o_ = Rr_.loc[pp_.iloc[0].partner]
+
                 st.markdown(
-                    f"**Yes.** Region {int(reg_.region)} has {len(pp_)} mirror partner(s). Best-supported: region {int(pp_.iloc[0].partner)} at {o_.lat:.1f}, {o_.lon:.1f}, "
-                    f"{pp_.iloc[0].km:.0f} km away, {'rising' if o_.slope > 0 else 'falling'} {abs(o_.slope):.3g} (grade {o_.grade}) while this side is {'rising' if reg_.slope > 0 else 'falling'}.")
+                    f"**Yes.** Region {int(reg_.region)} has "
+                    f"{len(pp_)} mirror partner(s). Best-supported: "
+                    f"region {int(pp_.iloc[0].partner)} at "
+                    f"{o_.lat:.1f}, {o_.lon:.1f}, "
+                    f"{pp_.iloc[0].km:.0f} km away, "
+                    f"{'rising' if o_.slope > 0 else 'falling'} "
+                    f"{abs(o_.slope):.3g} (grade {o_.grade}) while "
+                    f"this side is "
+                    f"{'rising' if reg_.slope > 0 else 'falling'}."
+                )
+
                 also = mirror_also(feat, reg_, o_)
-                st.markdown("Features that also split in opposite directions: " + (
-                    ", ".join(also) if also else "none, so no other loaded feature explains the split."))
+
+                st.markdown(
+                    "Features that also split in opposite directions: "
+                    + (
+                        ", ".join(also)
+                        if also
+                        else "none, so no other loaded feature explains the split."
+                    )
+                )
+
+        # Possible explanations
         st.markdown("**What may be behind it** (association, not cause)")
-        for c_ in causes(feat, r, X): st.markdown("- " + c_)
+
+        for c_ in causes(feat, r, X):
+            st.markdown("- " + c_)
+
+        # Other features
         st.markdown("**Other features here**")
-        st.markdown("| Feature | Direction | Grade |\n|---|---|---|\n" + "\n".join(
-            f"| {x['label']} | {('↑ rising' if x['sign'] > 0 else '↓ falling') if x['clear'] else 'no clear trend'} | {x['grade']} |"
-            for x in xr_))
+
+        st.markdown(
+            "| Feature | Direction | Grade |\n"
+            "|---|---|---|\n"
+            + "\n".join(
+                f"| {x['label']} | "
+                f"{('↑ rising' if x['sign'] > 0 else '↓ falling') if x['clear'] else 'no clear trend'} | "
+                f"{x['grade']} |"
+                for x in xr_
+            )
+        )
+
+        # Annual trend chart
         xs_, ys_ = cp.annual(series[str(clicked)])
-        fp = go.Figure([go.Scatter(x=xs_, y=ys_, mode="markers+lines", showlegend=False),
-                        go.Scatter(x=xs_, y=np.median(ys_ - r.slope * xs_) + r.slope * xs_, line=dict(dash="dash"),
-                                   showlegend=False)])
-        fp.update_layout(height=170, margin=dict(l=0, r=0, t=6, b=0), xaxis_title=None, yaxis_title=None);
+
+        fp = go.Figure([
+            go.Scatter(
+                x=xs_,
+                y=ys_,
+                mode="markers+lines",
+                showlegend=False
+            ),
+            go.Scatter(
+                x=xs_,
+                y=np.median(ys_ - r.slope * xs_) + r.slope * xs_,
+                line=dict(dash="dash"),
+                showlegend=False
+            )
+        ])
+
+        fp.update_layout(
+            height=170,
+            margin=dict(l=0, r=0, t=6, b=0),
+            xaxis_title=None,
+            yaxis_title=None
+        )
+
         fp = style_plotly(fp)
-        st.plotly_chart(fp, width="stretch", key="panel-chart")
+
+        st.plotly_chart(
+            fp,
+            width="stretch",
+            key="panel-chart"
+        )
+
         st.caption(
-            "Annual averages with the trend line (dashed) for this point: a compact version of the main trend chart below the map.")
+            "Annual averages with the trend line (dashed) for this point: "
+            "a compact version of the main trend chart below the map."
+        )
 
 # ---- Inspector
 st.header(f"Trend details: {C['label']} at {r.lat:.1f}, {r.lon:.1f}")
