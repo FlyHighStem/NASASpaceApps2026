@@ -279,3 +279,363 @@ Traceback (most recent call last):
   File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\features.py", line 400, in one
     raise RuntimeError(
 RuntimeError: FIRMS HTTP 400: Invalid MAP_KEY.
+
+=== Wildfire detections, intensity and peak season (NASA FIRMS)  [16:35:16] ===
+$ C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\.venv\Scripts\python.exe features.py fires --map-key *** --bbox -125 30 -110 45 --start 2002 --end 2025 --jobs 15
+1754 FIRMS requests (MODIS_SP). If you see errors, check the source name in the FIRMS API docs.
+Traceback (most recent call last):
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\features.py", line 650, in <module>
+    fires(a.csv, a.map_key, a.bbox, a.start, a.end, a.jobs)
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\features.py", line 437, in fires
+    parts = [p for p in ex.map(one, days) if p is not None]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\features.py", line 437, in <listcomp>
+    parts = [p for p in ex.map(one, days) if p is not None]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\_base.py", line 619, in result_iterator
+    yield _result_or_cancel(fs.pop())
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\_base.py", line 317, in _result_or_cancel
+    return fut.result(timeout)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\_base.py", line 449, in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\_base.py", line 401, in __get_result
+    raise self._exception
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\features.py", line 420, in one
+    raise RuntimeError(f"FIRMS HTTP {response.status_code}: {response.text[:300]}")
+RuntimeError: FIRMS HTTP 400: Invalid MAP_KEY.
+
+=== Wildfire detections, intensity and peak season (NASA FIRMS)  [17:03:00] ===
+$ C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\.venv\Scripts\python.exe features.py fires --map-key *** --bbox -125 30 -110 45 --start 2002 --end 2025 --jobs 15
+877 FIRMS requests (MODIS_SP). If you see errors, check the source name in the FIRMS API docs.
+Traceback (most recent call last):
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\features.py", line 653, in <module>
+    fires(a.csv, a.map_key, a.bbox, a.start, a.end, a.jobs)
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\features.py", line 440, in fires
+    parts = [p for p in ex.map(one, days) if p is not None]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\features.py", line 440, in <listcomp>
+    parts = [p for p in ex.map(one, days) if p is not None]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\_base.py", line 619, in result_iterator
+    yield _result_or_cancel(fs.pop())
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\_base.py", line 317, in _result_or_cancel
+    return fut.result(timeout)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\_base.py", line 456, in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\_base.py", line 401, in __get_result
+    raise self._exception
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\features.py", line 423, in one
+    raise RuntimeError(f"FIRMS HTTP {response.status_code}: {response.text[:300]}")
+RuntimeError: FIRMS HTTP 400: Invalid day range. Expects [1..5].
+
+=== Wildfire detections, intensity and peak season (NASA FIRMS)  [17:05:32] ===
+$ C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\.venv\Scripts\python.exe features.py fires --map-key *** --bbox -125 30 -110 45 --start 2002 --end 2025 --jobs 15
+877 FIRMS requests (MODIS_SP). If you see errors, check the source name in the FIRMS API docs.
+Traceback (most recent call last):
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\features.py", line 653, in <module>
+    fires(a.csv, a.map_key, a.bbox, a.start, a.end, a.jobs)
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\features.py", line 440, in fires
+    parts = [p for p in ex.map(one, days) if p is not None]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\features.py", line 440, in <listcomp>
+    parts = [p for p in ex.map(one, days) if p is not None]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\_base.py", line 619, in result_iterator
+    yield _result_or_cancel(fs.pop())
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\_base.py", line 317, in _result_or_cancel
+    return fut.result(timeout)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\_base.py", line 456, in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\_base.py", line 401, in __get_result
+    raise self._exception
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\features.py", line 423, in one
+    raise RuntimeError(f"FIRMS HTTP {response.status_code}: {response.text[:300]}")
+RuntimeError: FIRMS HTTP 400: Invalid day range. Expects [1..5].
+
+=== Wildfire detections, intensity and peak season (NASA FIRMS)  [17:05:52] ===
+$ C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\.venv\Scripts\python.exe features.py fires --map-key *** --bbox -125 30 -110 45 --start 2002 --end 2025 --jobs 15
+877 FIRMS requests (MODIS_SP). If you see errors, check the source name in the FIRMS API docs.
+Traceback (most recent call last):
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\features.py", line 653, in <module>
+    fires(a.csv, a.map_key, a.bbox, a.start, a.end, a.jobs)
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\features.py", line 440, in fires
+    parts = [p for p in ex.map(one, days) if p is not None]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\features.py", line 440, in <listcomp>
+    parts = [p for p in ex.map(one, days) if p is not None]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\_base.py", line 619, in result_iterator
+    yield _result_or_cancel(fs.pop())
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\_base.py", line 317, in _result_or_cancel
+    return fut.result(timeout)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\_base.py", line 456, in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\_base.py", line 401, in __get_result
+    raise self._exception
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\features.py", line 423, in one
+    raise RuntimeError(f"FIRMS HTTP {response.status_code}: {response.text[:300]}")
+RuntimeError: FIRMS HTTP 400: Invalid day range. Expects [1..5].
+
+=== Wildfire detections, intensity and peak season (NASA FIRMS)  [17:07:42] ===
+$ C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\.venv\Scripts\python.exe features.py fires --map-key *** --bbox -125 30 -110 45 --start 2002 --end 2025 --jobs 15
+877 FIRMS requests (MODIS_SP). If you see errors, check the source name in the FIRMS API docs.
+Traceback (most recent call last):
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\features.py", line 653, in <module>
+    fires(a.csv, a.map_key, a.bbox, a.start, a.end, a.jobs)
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\features.py", line 440, in fires
+    parts = [p for p in ex.map(one, days) if p is not None]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\features.py", line 440, in <listcomp>
+    parts = [p for p in ex.map(one, days) if p is not None]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\_base.py", line 619, in result_iterator
+    yield _result_or_cancel(fs.pop())
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\_base.py", line 317, in _result_or_cancel
+    return fut.result(timeout)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\_base.py", line 456, in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\_base.py", line 401, in __get_result
+    raise self._exception
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\features.py", line 423, in one
+    raise RuntimeError(f"FIRMS HTTP {response.status_code}: {response.text[:300]}")
+RuntimeError: FIRMS HTTP 400: Invalid day range. Expects [1..5].
+
+=== Wildfire detections, intensity and peak season (NASA FIRMS)  [17:52:10] ===
+$ C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\.venv\Scripts\python.exe features.py fires --map-key *** --bbox -125 30 -110 45 --start 2002 --end 2025 --jobs 15
+877 FIRMS requests (MODIS_SP). If you see errors, check the source name in the FIRMS API docs.
+Traceback (most recent call last):
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\features.py", line 653, in <module>
+    fires(a.csv, a.map_key, a.bbox, a.start, a.end, a.jobs)
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\features.py", line 440, in fires
+    parts = [p for p in ex.map(one, days) if p is not None]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\features.py", line 440, in <listcomp>
+    parts = [p for p in ex.map(one, days) if p is not None]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\_base.py", line 619, in result_iterator
+    yield _result_or_cancel(fs.pop())
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\_base.py", line 317, in _result_or_cancel
+    return fut.result(timeout)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\_base.py", line 456, in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\_base.py", line 401, in __get_result
+    raise self._exception
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\features.py", line 423, in one
+    raise RuntimeError(f"FIRMS HTTP {response.status_code}: {response.text[:300]}")
+RuntimeError: FIRMS HTTP 400: Invalid day range. Expects [1..5].
+
+=== Wildfire detections, intensity and peak season (NASA FIRMS)  [18:03:29] ===
+$ C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\.venv\Scripts\python.exe features.py fires --map-key *** --bbox -125 30 -110 45 --start 2002 --end 2025 --jobs 15
+877 FIRMS requests (MODIS_SP). If you see errors, check the source name in the FIRMS API docs.
+Traceback (most recent call last):
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\features.py", line 653, in <module>
+    fires(a.csv, a.map_key, a.bbox, a.start, a.end, a.jobs)
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\features.py", line 440, in fires
+    parts = [p for p in ex.map(one, days) if p is not None]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\features.py", line 440, in <listcomp>
+    parts = [p for p in ex.map(one, days) if p is not None]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\_base.py", line 619, in result_iterator
+    yield _result_or_cancel(fs.pop())
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\_base.py", line 317, in _result_or_cancel
+    return fut.result(timeout)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\_base.py", line 456, in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\_base.py", line 401, in __get_result
+    raise self._exception
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\features.py", line 423, in one
+    raise RuntimeError(f"FIRMS HTTP {response.status_code}: {response.text[:300]}")
+RuntimeError: FIRMS HTTP 400: Invalid day range. Expects [1..5].
+
+=== Wildfire detections, intensity and peak season (NASA FIRMS)  [18:10:51] ===
+$ C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\.venv\Scripts\python.exe features.py fires --map-key *** --bbox -125 30 -110 45 --start 2002 --end 2025 --jobs 15
+877 FIRMS requests (MODIS_SP). If you see errors, check the source name in the FIRMS API docs.
+Traceback (most recent call last):
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\features.py", line 653, in <module>
+    fires(a.csv, a.map_key, a.bbox, a.start, a.end, a.jobs)
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\features.py", line 440, in fires
+    parts = [p for p in ex.map(one, days) if p is not None]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\features.py", line 440, in <listcomp>
+    parts = [p for p in ex.map(one, days) if p is not None]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\_base.py", line 619, in result_iterator
+    yield _result_or_cancel(fs.pop())
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\_base.py", line 317, in _result_or_cancel
+    return fut.result(timeout)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\_base.py", line 456, in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\_base.py", line 401, in __get_result
+    raise self._exception
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\features.py", line 423, in one
+    raise RuntimeError(f"FIRMS HTTP {response.status_code}: {response.text[:300]}")
+RuntimeError: FIRMS HTTP 400: Invalid day range. Expects [1..5].
+
+=== Wildfire detections, intensity and peak season (NASA FIRMS)  [18:13:52] ===
+$ C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\.venv\Scripts\python.exe features.py fires --map-key *** --bbox -125 30 -110 45 --start 2002 --end 2025 --jobs 15
+877 FIRMS requests (MODIS_SP). If you see errors, check the source name in the FIRMS API docs.
+Traceback (most recent call last):
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\features.py", line 653, in <module>
+    fires(a.csv, a.map_key, a.bbox, a.start, a.end, a.jobs)
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\features.py", line 440, in fires
+    parts = [p for p in ex.map(one, days) if p is not None]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\features.py", line 440, in <listcomp>
+    parts = [p for p in ex.map(one, days) if p is not None]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\_base.py", line 619, in result_iterator
+    yield _result_or_cancel(fs.pop())
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\_base.py", line 317, in _result_or_cancel
+    return fut.result(timeout)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\_base.py", line 456, in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\_base.py", line 401, in __get_result
+    raise self._exception
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\features.py", line 423, in one
+    raise RuntimeError(f"FIRMS HTTP {response.status_code}: {response.text[:300]}")
+RuntimeError: FIRMS HTTP 400: Invalid day range. Expects [1..5].
+
+=== Wildfire detections, intensity and peak season (NASA FIRMS)  [18:25:20] ===
+$ C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\.venv\Scripts\python.exe features.py fires --map-key *** --bbox -125 30 -110 45 --start 2002 --end 2025 --jobs 15
+877 FIRMS requests (MODIS_SP). If you see errors, check the source name in the FIRMS API docs.
+Traceback (most recent call last):
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\features.py", line 653, in <module>
+    fires(a.csv, a.map_key, a.bbox, a.start, a.end, a.jobs)
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\features.py", line 440, in fires
+    parts = [p for p in ex.map(one, days) if p is not None]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\features.py", line 440, in <listcomp>
+    parts = [p for p in ex.map(one, days) if p is not None]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\_base.py", line 619, in result_iterator
+    yield _result_or_cancel(fs.pop())
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\_base.py", line 317, in _result_or_cancel
+    return fut.result(timeout)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\_base.py", line 456, in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\_base.py", line 401, in __get_result
+    raise self._exception
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\features.py", line 423, in one
+    raise RuntimeError(f"FIRMS HTTP {response.status_code}: {response.text[:300]}")
+RuntimeError: FIRMS HTTP 400: Invalid day range. Expects [1..5].
+
+=== Wildfire detections, intensity and peak season (NASA FIRMS)  [18:44:56] ===
+$ C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\.venv\Scripts\python.exe features.py fires --map-key *** --bbox -125 30 -110 45 --start 2002 --end 2025 --jobs 15
+877 FIRMS requests (MODIS_SP). If you see errors, check the source name in the FIRMS API docs.
+Traceback (most recent call last):
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\features.py", line 653, in <module>
+    fires(a.csv, a.map_key, a.bbox, a.start, a.end, a.jobs)
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\features.py", line 440, in fires
+    parts = [p for p in ex.map(one, days) if p is not None]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\features.py", line 440, in <listcomp>
+    parts = [p for p in ex.map(one, days) if p is not None]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\_base.py", line 619, in result_iterator
+    yield _result_or_cancel(fs.pop())
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\_base.py", line 317, in _result_or_cancel
+    return fut.result(timeout)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\_base.py", line 456, in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\_base.py", line 401, in __get_result
+    raise self._exception
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\features.py", line 423, in one
+    raise RuntimeError(f"FIRMS HTTP {response.status_code}: {response.text[:300]}")
+RuntimeError: FIRMS HTTP 400: Invalid day range. Expects [1..5].
+
+=== Wildfire detections, intensity and peak season (NASA FIRMS)  [18:46:06] ===
+$ C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\.venv\Scripts\python.exe features.py fires --map-key *** --bbox -125 30 -110 45 --start 2002 --end 2025 --jobs 15
+877 FIRMS requests (MODIS_SP). If you see errors, check the source name in the FIRMS API docs.
+Traceback (most recent call last):
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\features.py", line 653, in <module>
+    fires(a.csv, a.map_key, a.bbox, a.start, a.end, a.jobs)
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\features.py", line 440, in fires
+    parts = [p for p in ex.map(one, days) if p is not None]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\features.py", line 440, in <listcomp>
+    parts = [p for p in ex.map(one, days) if p is not None]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\_base.py", line 619, in result_iterator
+    yield _result_or_cancel(fs.pop())
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\_base.py", line 317, in _result_or_cancel
+    return fut.result(timeout)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\_base.py", line 456, in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\_base.py", line 401, in __get_result
+    raise self._exception
+  File "C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.11_3.11.2544.0_x64__qbz5n2kfra8p0\Lib\concurrent\futures\thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\features.py", line 423, in one
+    raise RuntimeError(f"FIRMS HTTP {response.status_code}: {response.text[:300]}")
+RuntimeError: FIRMS HTTP 400: Invalid day range. Expects [1..5].

@@ -163,8 +163,8 @@ def load_grace(path, var="lwe_thickness", mascon_var=None):
     v = da.values.reshape(da.sizes["time"], -1)
     keep = ds["land_mask"].values.ravel() == 1 if "land_mask" in ds else np.ones(LA.size, bool)
     keep &= ~np.isnan(v).all(axis=0); v, LA, LO = v[:, keep], LA[keep], LO[keep]
-    mv = mascon_var or "mascon_id"
-    if mv in ds: ids = ds[mv].values.ravel()[keep]; note = f"native_mascon_id ({mv})"
+    mv = mascon_var or next((v for v in ds.variables if str(v).lower() in ("mascon_id", "mascon_identifier")), "mascon_id")  # name differs by product (e.g. mascon_ID)
+    if mv in ds: ids = ds[mv].transpose("lat", "lon").values.ravel()[keep]; note = f"native_mascon_id ({mv})"
     else: ids = np.floor(LA/3)*1000+np.floor(LO/3); note = "APPROXIMATE 3-degree blocks (no mascon id layer found)"
     o = np.argsort(ids, kind="stable"); ids, v, LA, LO = ids[o], v[:, o], LA[o], LO[o]
     u, start = np.unique(ids, return_index=True); ok = ~np.isnan(v)

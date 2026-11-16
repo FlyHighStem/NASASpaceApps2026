@@ -92,7 +92,9 @@ with st.expander("Overview of the analysis process", expanded=True):
            them for the statistical trend tests. A year counts only if it
            has at least 9 months of data (peak-season fire series use their
            3 peak months), so the years inside the GRACE to GRACE-FO gap
-           normally drop out.
+           normally drop out. Because partial years are excluded, the
+           statistics for every feature use complete years only (through
+           2025 in this run), even where a source file extends into 2026.
 
         4. **Trend estimation:** Estimate the direction and magnitude
            of change using the Theil-Sen estimator.
@@ -351,7 +353,7 @@ with st.expander("GRACE Mission-Gap Test"):
         that coincides with the gap. It cannot tell an instrument offset
         from a real change that is accelerating or happens to straddle
         the gap. Treat D as "check this one", and compare with a smooth
-        curve (see `tools/diagnose_box.py`) before calling it an artifact.
+        curve fitted through the gap before calling it an artifact.
         """
     )
 
@@ -422,18 +424,16 @@ st.subheader("Independent cross-check")
 st.markdown(
     """
     To test that our trends are not an artefact of one data product or one
-    method, the same trend engine (annual means, Mann-Kendall, Theil-Sen) is
-    run, unchanged, on independent time series and the results are compared.
-    For each benchmark region, our NASA POWER (MERRA-2) precipitation and
-    temperature series are compared with GLDAS-Noah 2.1 monthly series
-    retrieved from NASA's GES DISC Hydrology Time Series service at the same
-    point. We report whether the two agree on trend direction, whether their
-    95% intervals overlap, and how closely their annual means move together.
-    Series exported by hand from Giovanni or KNMI Climate Explorer can be
-    compared the same way on the Cross-check page. Agreement between two
-    NASA products supports the climate signal, and disagreement is reported
-    rather than hidden. Both products are model based, so this is a
-    consistency check, not ground truth.
+    method, a monthly time series for a chosen point is exported by hand from
+    an independent NASA tool (Giovanni or GES DISC Hydrology Time Series) or
+    from KNMI Climate Explorer, and uploaded on the Cross-check page. The same
+    trend engine (annual means, Mann-Kendall, Theil-Sen) is run on it
+    unchanged and compared with our feature at the nearest unit. We report
+    whether the two agree on trend direction, whether their 95% intervals
+    overlap, and how closely their annual means move together. Each
+    comparison is saved to `output/crosscheck.csv`, including disagreements.
+    This is a consistency check on a few chosen points, not ground truth, and
+    the products may share inputs (for example model-based precipitation).
     """
 )
 
