@@ -639,3 +639,30 @@ Traceback (most recent call last):
   File "C:\522H0088_HoangVien\DVC\Personal Projects\NASASpaceApps2026\features.py", line 423, in one
     raise RuntimeError(f"FIRMS HTTP {response.status_code}: {response.text[:300]}")
 RuntimeError: FIRMS HTTP 400: Invalid day range. Expects [1..5].
+
+=== Wildfire detections, intensity and peak season (NASA FIRMS)  [18:56:29] ===
+$ /Users/aanyatiwari/Desktop/counterpoint/.venv/bin/python3.13 features.py fires --map-key *** --bbox -125 30 -110 45 --start 2002 --end 2025 --jobs 9
+877 FIRMS requests (MODIS_SP). If you see errors, check the source name in the FIRMS API docs.
+Traceback (most recent call last):
+  File "/Users/aanyatiwari/Desktop/counterpoint/features.py", line 653, in <module>
+    fires(a.csv, a.map_key, a.bbox, a.start, a.end, a.jobs)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/aanyatiwari/Desktop/counterpoint/features.py", line 440, in fires
+    parts = [p for p in ex.map(one, days) if p is not None]
+                        ~~~~~~^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 619, in result_iterator
+    yield _result_or_cancel(fs.pop())
+          ~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 317, in _result_or_cancel
+    return fut.result(timeout)
+           ~~~~~~~~~~^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 456, in result
+    return self.__get_result()
+           ~~~~~~~~~~~~~~~~~^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/_base.py", line 401, in __get_result
+    raise self._exception
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/Users/aanyatiwari/Desktop/counterpoint/features.py", line 423, in one
+    raise RuntimeError(f"FIRMS HTTP {response.status_code}: {response.text[:300]}")
+RuntimeError: FIRMS HTTP 400: Invalid day range. Expects [1..5].

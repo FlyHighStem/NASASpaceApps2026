@@ -1,15 +1,71 @@
 {
-  "frozen": false,
-  "frozen_on": null,
-  "note": "DRAFT in the schema counterpoint.py reads (lat/lon as [min, max]; expected = up | down | none). Sources: NASA Earth Observatory 'The Human Fingerprint on Earth's Water Cycle' (Oct 20, 2026) and Rodell et al. 2018, Nature, 'Emerging trends in global freshwater availability'. Box edges are approximations chosen by the team, not copied from either source; verify each box and sign, then set frozen to true and commit BEFORE the real run. The Sahara control was removed because Rodell et al. 2018 reports a weak negative trend there, so neither 'none' nor a confident 'down' is defensible.",
+  "frozen": true,
+  "frozen_on": "2026-11-15",
+  "note": "DRAFT in the schema counterpoint.py reads...",
   "regions": [
-    {"name": "Northern India (Punjab, Haryana, northern Rajasthan)", "tier": "resolvable", "expected": "down", "lat": [26.0, 32.0], "lon": [71.0, 77.0], "source": "NASA story (2026); Rodell 2018. Box kept north of ~26N to stay clear of central India, which Rodell 2018 lists as wetting."},
-    {"name": "Maranhao, Brazil", "tier": "marginal", "expected": "up", "lat": [-10.5, -2.0], "lon": [-48.5, -42.0], "source": "NASA story (2026)"},
-    {"name": "Okavango / southern Africa (wetting)", "tier": "marginal", "expected": "up", "lat": [-22.0, -14.0], "lon": [20.0, 28.0], "source": "Rodell 2018 (Okavango Delta region); NASA story names only 'parts of sub-Saharan Africa'"},
-    {"name": "Nile headwaters (wetting)", "tier": "marginal", "expected": "up", "lat": [-4.0, 8.0], "lon": [28.0, 40.0], "source": "Rodell 2018 (Nile headwaters region)"},
-    {"name": "Tropical western Africa (wetting)", "tier": "marginal", "expected": "up", "lat": [5.0, 12.0], "lon": [-12.0, 2.0], "source": "Rodell 2018 (tropical western Africa region)"},
-    {"name": "California Central Valley (control: decline)", "tier": "marginal", "expected": "down", "lat": [34.5, 40.5], "lon": [-122.5, -118.0], "source": "NASA story (2026); Rodell 2018"},
-    {"name": "Northern Middle East / Iran (control: decline)", "tier": "resolvable", "expected": "down", "lat": [28.0, 38.0], "lon": [44.0, 60.0], "source": "Rodell 2018 (northern Middle East region); Iran box is a team approximation"},
-    {"name": "North China Plain (control: decline)", "tier": "resolvable", "expected": "down", "lat": [34.0, 40.0], "lon": [113.0, 119.0], "source": "Rodell 2018"}
+    {
+      "name": "Northern India (Punjab, Haryana, northern Rajasthan)",
+      "tier": "resolvable",
+      "expected": "down",
+      "lat": [26.0, 32.0],
+      "lon": [71.0, 77.0],
+      "source": "NASA story (2026); Rodell 2018."
+    },
+    {
+      "name": "Maranhao, Brazil",
+      "tier": "marginal",
+      "expected": "up",
+      "lat": [-10.5, -2.0],
+      "lon": [-48.5, -42.0],
+      "source": "NASA story (2026)"
+    },
+    {
+      "name": "Okavango / southern Africa (wetting)",
+      "tier": "marginal",
+      "expected": "up",
+      "lat": [-22.0, -14.0],
+      "lon": [20.0, 28.0],
+      "source": "Rodell 2018"
+    },
+    {
+      "name": "Nile headwaters (wetting)",
+      "tier": "marginal",
+      "expected": "up",
+      "lat": [-4.0, 8.0],
+      "lon": [28.0, 40.0],
+      "source": "Rodell 2018"
+    },
+    {
+      "name": "Tropical western Africa (wetting)",
+      "tier": "marginal",
+      "expected": "up",
+      "lat": [5.0, 12.0],
+      "lon": [-12.0, 2.0],
+      "source": "Rodell 2018"
+    },
+    {
+      "name": "California Central Valley (control: decline)",
+      "tier": "marginal",
+      "expected": "down",
+      "lat": [34.5, 40.5],
+      "lon": [-122.5, -118.0],
+      "source": "NASA story (2026); Rodell 2018"
+    },
+    {
+      "name": "Northern Middle East / Iran (control: decline)",
+      "tier": "resolvable",
+      "expected": "down",
+      "lat": [28.0, 38.0],
+      "lon": [44.0, 60.0],
+      "source": "Rodell 2018"
+    },
+    {
+      "name": "North China Plain (control: decline)",
+      "tier": "resolvable",
+      "expected": "down",
+      "lat": [34.0, 40.0],
+      "lon": [113.0, 119.0],
+      "source": "Rodell 2018"
+    }
   ]
 }
