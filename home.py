@@ -258,6 +258,7 @@ st.markdown(
 
 # ---- Map (click a point to inspect it)
 st.header("Map")
+st.caption("Click a point to open its details and mirror cases below.")
 if d.empty: st.warning("No units match these filters."); st.stop()
 m = max(float(np.percentile(d.slope.abs(), pct)), 1e-9)
 fig = px.scatter_geo(d, lat="lat", lon="lon", color="slope", symbol="grade", category_orders={"grade": list("ABCD")},
@@ -308,7 +309,6 @@ except Exception:
 clicked = uid if (
             uid is not None and uid in set(d.id)) else None  # None = nothing selected: the details panel stays closed
 uid = clicked
-st.caption("Click a point to open its details and mirror cases below.")
 _warm = C["cmap"].startswith("BrBG")
 explain(
     f"Each dot is one 3-degree block of land (the same blocks are used for every feature). The colour is the trend: how fast {C['label'].lower()} is changing per year, in {C['unit']}. "
@@ -322,7 +322,17 @@ if feat == "grace_lwe" and os.path.exists(f"{O}/results.geojson"): c2.download_b
     f"{O}/results.geojson").read(), "counterpoint_results.geojson")
 if uid is None:
     ids = d.sort_values("slope", key=abs, ascending=False).id.tolist();
-    uid = st.selectbox("...or pick a location (largest trends first)", ids)
+    st.markdown(
+        "<p style='font-size:1.15rem; font-weight:800; color:#2563A6; "
+        "margin-bottom:6px;'>📍 Find a Location</p>",
+        unsafe_allow_html=True
+    )
+
+    uid = st.selectbox(
+        "Choose a data point (largest trends first)",
+        ids,
+        label_visibility="visible"
+    )
 r = df[df.id == uid].iloc[0]
 
 # ---- Right-hand details panel: exists only while a point is selected
@@ -692,32 +702,82 @@ for k in avail:
                                    "grade": q.grade, "distance_km": round(km)})
 st.dataframe(pd.DataFrame(rows), hide_index=True)
 
+
 # ---- Mirror cases for this selection
 st.header("Mirror cases for this trend")
+
 region = None
+
 if len(R):
     for _, g in R.iterrows():
-        if str(uid) in str(g.members).split(";"): region = g; break
+        if str(uid) in str(g.members).split(";"):
+            region = g
+            break
+
 if region is None:
-    st.info("This location is not part of an A/B region, so it has no mirror analysis. Pick an A or B point.")
+    st.info(
+        "This location is not part of an A/B region, "
+        "so it has no mirror analysis. Pick an A or B point."
+    )
+
 else:
-    pp = P[(P.up == region.region) | (P.down == region.region)] if len(P) else P
     st.write(
-        f"This location belongs to region {int(region.region)} ({int(region.n)} mascon(s), {arrow(region.slope)}, grade {region.grade}).")
+        f"This location belongs to region {int(region.region)} "
+        f"({int(region.n)} mascon(s), {arrow(region.slope)}, "
+        f"grade {region.grade})."
+    )
+
+    pp = (
+        P[(P.up == region.region) | (P.down == region.region)]
+        if len(P) else P
+    )
+
     if pp.empty:
-        st.write("No opposite-sign A/B region within 6,000 km: no mirror case for this trend.")
-    else:
-        pp = pp.assign(partner=np.where(pp.up == region.region, pp.down, pp.up));
-        Rr = R.set_index("region")
-        pick = st.selectbox("Mirror partner (best-supported first)", pp.partner.tolist(), format_func=lambda
-            i: f"region {int(i)} at {Rr.loc[i, 'lat']:.1f}, {Rr.loc[i, 'lon']:.1f} ({arrow(Rr.loc[i, 'slope'])})")
-        o = Rr.loc[pick];
-        km = float(pp[pp.partner == pick].km.iloc[0])
         st.write(
-            f"**{CAT[feat]['label']} moves {arrow(region.slope)} here and {arrow(o.slope)} {km:.0f} km away** (partner grade {o.grade}, slope {o.slope:.3g}).")
-        mp = px.scatter_geo(pd.DataFrame(
-            {"lat": [region.lat, o.lat], "lon": [region.lon, o.lon], "side": ["selected", "mirror partner"]}),
-                            lat="lat", lon="lon", color="side")
+            "No opposite-sign A/B region within 6,000 km: "
+            "no mirror case for this trend."
+        )
+
+    else:
+        pp = pp.assign(
+            partner=np.where(
+                pp.up == region.region,
+                pp.down,
+                pp.up
+            )
+        )
+
+        Rr = R.set_index("region")
+
+        pick = st.selectbox(
+            "Mirror partner (best-supported first)",
+            pp.partner.tolist(),
+            format_func=lambda i:
+                f"region {int(i)} at "
+                f"{Rr.loc[i, 'lat']:.1f}, {Rr.loc[i, 'lon']:.1f} "
+                f"({arrow(Rr.loc[i, 'slope'])})"
+        )
+
+        o = Rr.loc[pick]
+        km = float(pp[pp.partner == pick].km.iloc[0])
+
+        st.write(
+            f"**{CAT[feat]['label']} moves {arrow(region.slope)} here "
+            f"and {arrow(o.slope)} {km:.0f} km away** "
+            f"(partner grade {o.grade}, slope {o.slope:.3g})."
+        )
+
+        # Mirror map
+        mp = px.scatter_geo(
+            pd.DataFrame({
+                "lat": [region.lat, o.lat],
+                "lon": [region.lon, o.lon],
+                "side": ["selected", "mirror partner"]
+            }),
+            lat="lat",
+            lon="lon",
+            color="side"
+        )
 
         mp.update_traces(marker=dict(size=12))
 
@@ -738,23 +798,68 @@ else:
 
         mp = style_plotly(mp)
         st.plotly_chart(mp, width="stretch", key="mirror-map")
+
         explain(
-            f"The two markers are the selected region and its best mirror partner: two areas where {C['label'].lower()} moves in opposite directions, each with a trend graded A or B and within 6,000 km of each other.",
-            "This is the central idea of the challenge: the same process can push a variable up in one region and down in another. The table below checks whether other features split the same way, which points to a candidate explanation (association, never proof of cause).")
+            f"The two markers are the selected region and its best mirror partner: "
+            f"two areas where {C['label'].lower()} moves in opposite directions, "
+            "each with a trend graded A or B and within 6,000 km of each other.",
+            "This is the central idea of the challenge: the same process can "
+            "push a variable up in one region and down in another. We compare "
+            "other features across both locations to look for possible "
+            "explanations (association, never proof of cause)."
+        )
+
+        # Compare other features
         rows = []
+
         for k in avail:
-            if k == feat: continue
-            q1, _ = nearest(k, region.lat, region.lon);
+            if k == feat:
+                continue
+
+            q1, _ = nearest(k, region.lat, region.lon)
             q2, _ = nearest(k, o.lat, o.lon)
-            if q1 is None or q2 is None: continue
+
+            if q1 is None or q2 is None:
+                continue
+
             c1_, c2_ = q1.grade in "AB", q2.grade in "AB"
+
             verdict = (
-                "ALSO MIRRORS: opposite directions" if c1_ and c2_ and q1.sign != q2.sign else "same direction on both sides" if c1_ and c2_ else "trend clear on one side only" if c1_ or c2_ else "no clear trend")
-            rows.append({"feature": CAT[k]["label"], "here": arrow(q1.slope) if c1_ else "no clear trend",
-                         "partner": arrow(q2.slope) if c2_ else "no clear trend", "reading": verdict})
-        st.markdown(
-            "**Which other features mirror too?** A feature that splits the same way is a candidate explanation (association only, never proof of cause).")
-        st.dataframe(pd.DataFrame(rows), hide_index=True)
+                "ALSO MIRRORS: opposite directions"
+                if c1_ and c2_ and q1.sign != q2.sign
+                else "same direction on both sides"
+                if c1_ and c2_
+                else "trend clear on one side only"
+                if c1_ or c2_
+                else "no clear trend"
+            )
+
+            rows.append({
+                "feature": CAT[k]["label"],
+                "here": arrow(q1.slope) if c1_ else "no clear trend",
+                "partner": arrow(q2.slope) if c2_ else "no clear trend",
+                "reading": verdict
+            })
+
+        # Show only features that also mirror
+        mirrored_rows = [
+            row for row in rows
+            if row["reading"] == "ALSO MIRRORS: opposite directions"
+        ]
+
+        if mirrored_rows:
+            st.markdown(
+                "**Which other features mirror too?** "
+                "A feature that splits the same way is a candidate explanation "
+                "(association only, never proof of cause)."
+            )
+
+            st.dataframe(
+                pd.DataFrame(mirrored_rows),
+                hide_index=True
+            )
+
+
 
 # ---- Benchmark + methods
 if os.path.exists(f"{O}/benchmark.csv") and os.path.exists(f"{O}/sources.json"):
