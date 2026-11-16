@@ -242,7 +242,7 @@ box = PRESETS[region]
 if st.sidebar.button("Reset map view"): st.session_state["map_rev"] = st.session_state.get("map_rev", 0) + 1
 rev = st.session_state.get("map_rev", 0)
 hide_ice = st.sidebar.checkbox("Hide Antarctica and Greenland", True)
-pct = st.sidebar.slider("Colour range = percentile of trend size", 80, 100, 95)
+pct = st.sidebar.slider("Color range = percentile of trend size", 80, 100, 95)
 df, series, R, P, meta = load(feat)
 d = df[df.grade.isin(grades)]
 if direction != "Both": d = d[d.sign > 0] if direction == "Rising" else d[d.sign < 0]
