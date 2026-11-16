@@ -171,10 +171,10 @@ st.markdown(
 with st.expander("How to read the heatmap", expanded=True):
     st.markdown(
         """
-        - **Consistent colours:** Different time windows produce trends
+        - **Consistent colors:** Different time windows produce trends
           in the same direction, supporting a more robust interpretation.
 
-        - **Mixed colours:** Some windows produce opposite-direction
+        - **Mixed colors:** Some windows produce opposite-direction
           trends, suggesting that the overall result depends on the
           observation period.
 

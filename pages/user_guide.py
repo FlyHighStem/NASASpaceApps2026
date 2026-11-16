@@ -61,7 +61,7 @@ st.subheader("The 60-second version")
 st.markdown(
     """
     1. Open the **Home** page and wait for the first-time setup to finish.
-    2. Look at the map. Colour shows the direction and size of a trend.
+    2. Look at the map. color shows the direction and size of a trend.
        The evidence grade (A to D) shows how much to trust it.
     3. Click a location to see its time series and the reason for its grade.
     4. Check the **mirror pairs** to find regions moving in opposite directions.
@@ -185,7 +185,7 @@ st.header("Using the Home page")
 with st.expander("1. The map", expanded=True):
     st.markdown(
         """
-        Each map unit is coloured by the **sign and size** of its trend, and the **evidence grade**
+        Each map unit is colored by the **sign and size** of its trend, and the **evidence grade**
         controls how strongly it is drawn. Use the grade filter to hide weak evidence, and the
         download buttons to save the results as CSV or GeoJSON.
 

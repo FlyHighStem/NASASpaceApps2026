@@ -253,7 +253,7 @@ if box: d = d[(d.lat >= box[0][0]) & (d.lat <= box[0][1]) & (d.lon >= box[1][0])
 st.title("Counterpoint: Earth System Trend Detective")
 st.caption(f"{theme} | {C['label']} | {C['kind']} | {meta['source']} | fetched {meta['fetched'][:10]}")
 st.markdown(
-    f"**{C['label']}.** {C['desc']}  \nGrade **A** robust, **B** fragile, **C** indistinguishable from noise, **D** unreliable. Colour = trend in {C['unit']} (symmetric about zero; brown/red end = drying or warming, blue/green = wetting).")
+    f"**{C['label']}.** {C['desc']}  \nGrade **A** robust, **B** fragile, **C** indistinguishable from noise, **D** unreliable. color = trend in {C['unit']} (symmetric about zero; brown/red end = drying or warming, blue/green = wetting).")
 
 # ---- Map (click a point to inspect it)
 st.header("Map")
@@ -295,10 +295,10 @@ fig.update_geos(
 fig.update_layout(
     height=560,
     margin=dict(l=0, r=0, t=0, b=0),
-    # grade legend: bottom-left, inside the map, horizontal, so it never touches the colour bar
+    # grade legend: bottom-left, inside the map, horizontal, so it never touches the color bar
     legend=dict(title_text="Evidence grade", orientation="h", x=0.01, y=0.02, xanchor="left", yanchor="bottom",
                 bgcolor="rgba(255,255,255,0.85)", bordercolor="#D5E0EC", borderwidth=1),
-    # colour bar: title on top, shorter and vertically centred, clear of the legend
+    # color bar: title on top, shorter and vertically centred, clear of the legend
     coloraxis_colorbar=dict(title=dict(text=C["unit"], side="top"), len=0.7, y=0.5, thickness=14),
     uirevision=f"{region}-{rev}"
 )
@@ -752,8 +752,8 @@ if clicked is not None:
         key="trend-heatmap"
     )
     explain(
-        "Each cell is the trend you would get using only the years from its row (start year) to its column (end year), for windows of at least 10 years, so only the upper-right triangle is filled. The colours use the same scale as the map.",
-        "This is the robustness check. If the whole triangle has one colour, the trend does not depend on which years you pick (grade A). If colours flip between red and blue, the answer changes with the window, so it is fragile (grade B) and could be a natural cycle such as a multi-year drought. About two decades of data can mistake a cycle for a trend, and this chart shows when that risk is real.")
+        "Each cell is the trend you would get using only the years from its row (start year) to its column (end year), for windows of at least 10 years, so only the upper-right triangle is filled. The colors use the same scale as the map.",
+        "This is the robustness check. If the whole triangle has one color, the trend does not depend on which years you pick (grade A). If colors flip between red and blue, the answer changes with the window, so it is fragile (grade B) and could be a natural cycle such as a multi-year drought. About two decades of data can mistake a cycle for a trend, and this chart shows when that risk is real.")
 
     st.subheader("All features at this location")
     st.caption(
