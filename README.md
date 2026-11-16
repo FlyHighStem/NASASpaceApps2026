@@ -15,7 +15,7 @@ Before the first launch, freeze `data/benchmark_regions.json` (see below); the a
 
 # Counterpoint: water + wildfire trends (real NASA data only)
 
-Evidence-graded trend maps (A robust, B fragile, C indistinguishable from noise, D gap artifact) and a mirror finder for regions that move in opposite directions. Everything shown in the app must come from real data; `validate` and the tests use SYNTHETIC data and never feed the app.
+Evidence-graded trend maps (A robust, B fragile, C indistinguishable from noise, D possible gap artifact, a caution flag) and a mirror finder for regions that move in opposite directions. Everything shown in the app must come from real data; `validate` and the tests use SYNTHETIC data and never feed the app.
 
 ## 0. Setup (once)
 
@@ -41,7 +41,7 @@ ls data/*.nc
 python tools/inspect_grace.py data/<FILE>.nc       # check variable names, units, time, mascon layer
 ```
 
-`tools/inspect_grace.py` ends with a compatibility report. The loader expects the data variable `lwe_thickness`, an optional `land_mask`, and an optional mascon-ID layer called `mascon_id`. If the real names differ, pass them:
+`tools/inspect_grace.py` ends with a compatibility report. The loader expects the data variable `lwe_thickness`, an optional `land_mask`, and an optional mascon-ID layer (`mascon_ID` or `mascon_id`, case-insensitive). If the real names differ, pass them:
 
 ```bash
 python counterpoint.py run --grace data/<FILE>.nc --var <DATA_VAR> --mascon-var <MASCON_ID_VAR> --jobs 4
@@ -90,6 +90,10 @@ python features.py fires --map-key YOUR_KEY --bbox -125 30 -110 45 --start 2002 
 This sends about 1,750 requests per bounding box (5-day windows). `MODIS_SP` is a valid source name; check how far it runs with `https://firms.modaps.eosdis.nasa.gov/api/data_availability/csv/YOUR_KEY/MODIS_SP`. FIRMS archive CSVs work too: `python features.py fires --csv a.csv b.csv --start 2002 --end 2025`.
 
 Burned area (`python features.py burned --nc FILE.nc --var NAME`) needs a lat/lon/time NetCDF you already have. No source was verified; skip it unless you have one.
+
+## 4b. Independent cross-check (by hand, in the app)
+
+Export one monthly time series for a point from Giovanni, GES DISC Hydrology Time Series or KNMI Climate Explorer, then upload it on the Cross-check page. The same trend test is run on it and compared with our feature at that location; each comparison is saved to `output/crosscheck.csv`. Nothing is fetched automatically (the Hydrology Time Series web service returned an HTML page to scripts, so that route was dropped).
 
 ## 5. Checks
 

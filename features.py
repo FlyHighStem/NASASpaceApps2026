@@ -390,21 +390,41 @@ def fires(csvs=None, key=None, bbox=None, start=2002, end=2025, jobs=1):
             freq="5D"
         )
 
+        import time
+        os.makedirs(f"{O}/cache/firms", exist_ok=True)
+
         def one(d):
-            url = (
-                "https://firms.modaps.eosdis.nasa.gov/api/area/csv/"
-                f"{key}/MODIS_SP/{w},{s},{e},{n}/5/{d.date()}"
-            )
-            response = requests.get(url, timeout=120)
-            if not response.ok:
-                raise RuntimeError(
-                    f"FIRMS HTTP {response.status_code}: {response.text[:1000]}"
+            """One 5-day window. Cached on disk, so a rerun only fetches what is missing.
+            FIRMS limits requests per 10 minutes: on that error, wait and retry instead of aborting."""
+            fn = f"{O}/cache/firms/{w}_{s}_{e}_{n}_{d.date()}.csv"
+            if os.path.exists(fn):
+                t = open(fn).read()
+            else:
+                url = (
+                    "https://firms.modaps.eosdis.nasa.gov/api/area/csv/"
+                    f"{key}/MODIS_SP/{w},{s},{e},{n}/5/{d.date()}"
                 )
-            t = response.text
-
-            if "latitude" not in t[:300]:
-                raise RuntimeError(t[:200])
-
+                t = None
+                for attempt in range(40):
+                    try:
+                        response = requests.get(url, timeout=120)
+                    except requests.RequestException:
+                        time.sleep(5)
+                        continue
+                    if response.ok and ("latitude" in response.text[:300] or not response.text.strip()):
+                        t = response.text
+                        break
+                    if "transaction limit" in response.text.lower():
+                        time.sleep(60)  # the allowance resets every few minutes
+                        continue
+                    raise RuntimeError(f"FIRMS HTTP {response.status_code}: {response.text[:300]}")
+                if t is None:
+                    raise RuntimeError("FIRMS kept refusing requests (rate limit or network). Run again in a few minutes; finished windows are cached.")
+                with open(fn + ".tmp", "w") as f_:
+                    f_.write(t)
+                os.replace(fn + ".tmp", fn)
+            if not t.strip():
+                return None
             df = pd.read_csv(io.StringIO(t))
             return _count(df) if len(df) else None
 
@@ -413,7 +433,7 @@ def fires(csvs=None, key=None, bbox=None, start=2002, end=2025, jobs=1):
             "If you see errors, check the source name in the FIRMS API docs."
         )
 
-        with ThreadPoolExecutor(6) as ex:
+        with ThreadPoolExecutor(3) as ex:
             parts = [p for p in ex.map(one, days) if p is not None]
 
     if not parts:

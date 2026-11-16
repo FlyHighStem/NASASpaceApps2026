@@ -134,7 +134,7 @@ def causes(feat_, r_, X_):
     out = [];
     P_ = X_.get("PRECTOTCORR", {}).get("sign", 0)
     if r_.grade == "D": out.append(
-        "Grade D: a step at the GRACE to GRACE-FO gap fits better than a steady trend, so this may be an instrument artifact rather than a real change.")
+        "Grade D: a step at the GRACE to GRACE-FO gap is statistically significant. It can be an instrument offset or a real change that straddles the gap, so check it before trusting this trend.")
     if feat_ in ("grace_lwe", "GW_ANOM"):
         if s_ < 0 and P_ < 0:
             out.append(
@@ -403,7 +403,7 @@ explain(
     f"The grey line is the monthly value after removing the normal seasonal cycle. The dots are annual averages, which are what the statistics test. The dashed line is the Theil-Sen trend: the median slope between all pairs of years, so one odd year barely moves it."
     + (" The grey band marks the gap between the GRACE and GRACE-FO satellites (mid-2017 to mid-2018)." if feat in (
         "grace_lwe", "GW_ANOM") else ""),
-    "It lets you judge the trend with your own eyes: a steady drift is convincing, while a sudden jump (for example across the satellite gap) points to an instrument artifact, which is what grade D flags. Annual averages are tested because month-to-month values are strongly linked, and testing them directly would overstate how certain the trend is.")
+    "It lets you judge the trend with your own eyes: a steady drift is convincing, while a sudden jump across the satellite gap is a warning sign (an instrument offset or a real change), which is what grade D flags for a closer look. Annual averages are tested because month-to-month values are strongly linked, and testing them directly would overstate how certain the trend is.")
 n = len(x);
 H = np.full((n, n), np.nan)
 for i in range(n):

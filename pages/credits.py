@@ -88,19 +88,20 @@ with st.expander("GRACE and GRACE-FO — Gravity Recovery and Climate Experiment
         """
     )
 
-with st.expander("GES DISC Hydrology Time Series and GLDAS — Global Land Data Assimilation System"):
+with st.expander("Giovanni and GES DISC Hydrology Time Series — independent time-series tools"):
     st.markdown(
         """
         **Provider:** NASA Goddard Earth Sciences Data and Information Services
-        Center (GES DISC) and NASA's Land Data Assimilation team.
+        Center (GES DISC).
 
-        **How it is used:** GLDAS-Noah 2.1 monthly series, retrieved through the
-        Hydrology Time Series service, are used as an independent cross-check of
-        our precipitation and temperature trends. GLDAS soil moisture, snow and
-        canopy water are also subtracted from GRACE to form the groundwater-style
-        anomaly, which still contains surface water and reservoirs.
+        **How it is used:** Monthly time series for chosen points are exported
+        from these tools (and from KNMI Climate Explorer) and uploaded on the
+        Cross-check page, where the same trend test is run on them and compared
+        with our results.
 
-        **Data access:** [NASA Hydrology Time Series](https://disc.gsfc.nasa.gov/information/tools?title=Hydrology%20Time%20Series)
+        **Data access:** [NASA Giovanni](https://giovanni.gsfc.nasa.gov/) ·
+        [NASA Hydrology Time Series](https://disc.gsfc.nasa.gov/information/tools?title=Hydrology%20Time%20Series) ·
+        [KNMI Climate Explorer](https://climexp.knmi.nl/)
         """
     )
 
@@ -170,7 +171,7 @@ technology_items = [
     ("Plotly", "Interactive charts and geographic visualizations"),
     ("Earthaccess", "Access to supported NASA Earthdata resources"),
     ("SciPy and xarray", "Statistical functions and NetCDF data handling"),
-    ("Requests", "Retrieval from NASA POWER, FIRMS and Hydrology Time Series web services"),
+    ("Requests", "Retrieval from NASA POWER and FIRMS web services"),
 ]
 
 for technology, purpose in technology_items:
